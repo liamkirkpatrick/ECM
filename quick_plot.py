@@ -122,7 +122,7 @@ data_depth = top_depth + (xmax  - index_mark - data_x) / 1000
 # assign y vector
 y_vec = np.unique(data_y)
 
-#%% Figure 1 - top down view
+#%% Figure 1 - top down view (left subplot), curves (right subplot)
 
 fig,axs = plt.subplots(1,2,figsize = (14,11))
 
