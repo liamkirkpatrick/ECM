@@ -9,7 +9,9 @@ Script to rapidly plot ECM scripts from ECM computer
 Inputs:
     filename
 Outputs:
-    plot of 
+    plot of data from file, both conductivity curves and top down.
+    
+NOTE: MUST UPDATE PATH TO DATA AND FIGURES BEFORE RUNNING
 
 @author: Liam
 """
@@ -34,11 +36,11 @@ from matplotlib.patches import Rectangle
 
 # path to data
 # path to the folder where the datafile in question is stored
-path_to_data = '2023-08-23'
+path_to_data = '../../rapid_plotting/2023-08-23'
 
 # path to figures
 # path to the folder where figures made by this program will be stored
-path_to_figures = 'figures'
+path_to_figures = '../../rapid_plotting/figures'
 
 # header length in data file (should be constant unless master script is changed)
 h=18
@@ -125,8 +127,8 @@ y_vec = np.unique(data_y)
 fig,axs = plt.subplots(1,2,figsize = (14,11))
 
 # compute ranges used in graph
-pltmin = np.percentile(data_meas,10)
-pltmax = np.percentile(data_meas,90)
+pltmin = np.percentile(data_meas,5)
+pltmax = np.percentile(data_meas,95)
 dmax = max(data_depth)
 dmin = min(data_depth)
 ystep = y_vec[1] - y_vec[0]
@@ -143,13 +145,6 @@ axs[0].set_ylabel('Depth (m)')
 axs[0].set_xlabel('Distance Accross Core (mm)')
 axs[1].set_ylabel('Depth (m)')
 axs[1].set_xlabel('Conductivity (amps)')
-
-# invert y axis, so depth increases down
-axs[1].invert_yaxis()
-axs[0].invert_yaxis()
-
-# invert x axis, so it matches the way data is read in (right side first, with y=0)
-axs[0].invert_xaxis()
 
 # set axis limits
 #axs[1].set_xlim([0.8*10**(-8), 2.3*10**(-8)])
@@ -188,96 +183,19 @@ for j in range(len(y_vec)):
         #     axs[0].add_patch(Rectangle((y_vec[j]-4.7,depth[i]),9.4,depth[i+1]-depth[i],facecolor=my_cmap(rescale(meas[i]))))    
                     
         axs[1].plot([meas[i],meas[i+1]],[depth[i],depth[i+1]],color=cmap(j/len(y_vec)))
+        
+# invert y axis, so depth increases down
+axs[1].invert_yaxis()
+axs[0].invert_yaxis()
 
-plt.show()
+# invert x axis on top-down plot, so it matches the way data is read in 
+# (right side first, with y=0 on right)
+axs[0].invert_xaxis()
 
-# # make colormap
-# cmap = matplotlib.colormaps.get_cmap('plasma')
 
-# # basic setup
-# plt.figure(1)
-# plt.clf()
-# plt.figure(figsize=(8,8),dpi=400)
-# plt.gca().invert_yaxis()
-# plt.gca().invert_xaxis()
 
-# pltmax=0
-# pltmin=1
-
-# for j in range(len(y_vec)):
-#     plt.plot(data_meas[data_y==y_vec[j]],depth[data_y==y_vec[j]],color=cmap(j/len(y_vec)))
     
-#     try:
-#         y = data_meas[data_y==y_vec[j]]
-#         pltmax_i = np.max(y[50:-50]) * 1.1
-#         pltmin_i = np.min(y[50:-50]) * .9
-#     except:
-#         pltmax_i = np.max(y)
-#         pltmin_i = np.min(y)
-#         print("*********\n")
-#         print('Error\n')
-    
-#     if pltmax_i>pltmax:
-#         pltmax = pltmax_i
-#     if pltmin_i<pltmin:
-#         pltmin = pltmin_i
-#     # plot houskeeping
-
-# # plot housekeeping
-# plt.title(filename+' Conductivity Curves View')
-# plt.ylabel('Depth (m)')
-# plt.xlabel('Current (amp)')
-# plt.legend(y_vec,title='Distance accross core:')
-# plt.xlim([pltmin, pltmax])
-
-# plt.savefig(path_to_figures+'/topdown_'+filename+'.png', 
-#             transparent = False,  
-#             facecolor = 'white',
-#             dpi=450
-#             )
-    
-
-# #%% Figure 2 - top down view
-
-# # make colormap
-# cmap = matplotlib.colormaps.get_cmap('coolwarm')
-
-# # basic setup
-# plt.figure(2)
-# plt.clf()
-# plt.figure(figsize=(8,8))
-# plt.gca().invert_yaxis()
-
-# pltmax=0
-# pltmin=1
-
-# for j in range(len(y_vec)):
-#     plt.plot(data_meas[data_y==y_vec[j]],depth[data_y==y_vec[j]],color=cmap(j/len(y_vec)))
-    
-#     try:
-#         y = data_meas[data_y==y_vec[j]]
-#         pltmax_i = np.max(y[50:-50]) * 1.1
-#         pltmin_i = np.min(y[50:-50]) * .9
-#     except:
-#         pltmax_i = np.max(y)
-#         pltmin_i = np.min(y)
-#         print("*********\n")
-#         print('Error\n')
-    
-#     if pltmax_i>pltmax:
-#         pltmax = pltmax_i
-#     if pltmin_i<pltmin:
-#         pltmin = pltmin_i
-#     # plot houskeeping
-
-# # plot housekeeping
-# plt.title(filename+' Conductivity Curves View')
-# plt.ylabel('Depth (m)')
-# plt.xlabel('Current (amp)')
-# plt.legend(y_vec,title='Distance accross core:')
-# plt.xlim([pltmin, pltmax])
-    
-plt.savefig(path_to_figures+'/curves_'+filename+'.png', 
+fig.savefig(path_to_figures+'/curves_'+filename+'.png', 
             transparent = False,  
             facecolor = 'white',
             dpi=450

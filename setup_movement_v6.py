@@ -3,10 +3,10 @@ Liam Kirkpatrick
 setup_movement_v6.py
 
 upgrade to setup_movement3.py. Adds checks that device doesn't move too far,
-and allows value input without 
+and allows value input without mouse click.
 Used in ecmgui_v27.py and later.
 
-This code integrates xbox controller for the first time
+This version integrates xbox controller for the first time
 '''
 
 import constants as c

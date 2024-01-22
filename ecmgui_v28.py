@@ -1,17 +1,16 @@
 """
 
 Liam Kirkpatrick
-ECM GUI system - 25th iteration (builds on ecmgui_23.py, skip 24)
-June 12, 2023
-ICF VERSION
+ECM GUI system - 28th iteration (builds on ecmgui_27.py)
+August, 2023
 
-records true depth. Integrates inline plotting. Calls new settup script
+records true depth. Integrates inline plotting. Calls new settup script.
+Compadible with xbox controller
 
 Requires functions:
   -laser_v2
   -makegui_v8
   -setup_movement_v3
-
 """
 
 
@@ -62,8 +61,6 @@ today = datetime.datetime.now().strftime("%Y-%m-%d-%h-%m")
 
 # Set quit variable to True (means don't quit)
 qt = True
-
-
 
 #%%  Open GUI
 # ==========================================================================================================
