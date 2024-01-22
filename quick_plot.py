@@ -49,7 +49,7 @@ h=18
 
 # true/false toggle allows us to manually set the title without having to 
 # input anything
-if False:
+if True:
 
     filename = input('Input filename to plot (or type \'last\' for most recent file: ')
     
@@ -126,6 +126,8 @@ y_vec = np.unique(data_y)
 
 fig,axs = plt.subplots(1,2,figsize = (14,11))
 
+print("Started plotting - allow up to 30 secconds")
+
 # compute ranges used in graph
 pltmin = np.percentile(data_meas,5)
 pltmax = np.percentile(data_meas,95)
@@ -162,17 +164,15 @@ for i in range(len(y_vec)):
     ind = data_y==y_vec[i]
     plt.plot(data_meas[ind],data_depth[ind],color='w')
 leg = axs[1].legend(y_vec,title='Distance accross core:',loc='lower left')
-for k in range(len(leg.legendHandles)):
-    leg.legendHandles[k].set_color(cmap(k/len(y_vec)))
+for k in range(len(leg.legend_handles)):
+    leg.legend_handles[k].set_color(cmap(k/len(y_vec)))
 
 
 for j in range(len(y_vec)):
     meas = data_meas[data_y==y_vec[j]]
     depth = data_depth[data_y==y_vec[j]]
     button = data_button[data_y==y_vec[j]]
-    
-    print('Y = '+str(y_vec[j]))
-    
+        
     for i in range(len(meas)-1):
         
         axs[0].add_patch(Rectangle((y_vec[j]-ystep/2+0.3,depth[i]),ystep-0.6,depth[i+1]-depth[i],facecolor=my_cmap(rescale(meas[i]))))
@@ -201,4 +201,6 @@ fig.savefig(path_to_figures+'/curves_'+filename+'.png',
             dpi=450
             )
 
+
+print("Complete. Figure saved to \'figures\' folder")
 
