@@ -418,8 +418,11 @@ window['-SETUP_STATUS-'].update('*** SETUP STARTED ***')
 #mcc_digital(dio_device, port_to_write, 128)
 ul.d_out(board_num, port.type, 128)
 
-if True:  # gives option to skip setup while debugging
 
+# THIS IS WHERE YOU CAN MANUALLY FORCE SETUP
+# On previous run, note ice dimensions
+# set below to FALSE. Then enter dimensions below. 
+if True:  
     if qt:
         [xtie, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
     if qt:
@@ -470,6 +473,10 @@ else:
     xmax =  727.52 / c.x_conv 
     yl = 64.57
     yr = 109.43
+    
+    # don't worry about this - just sets y axis for ac. Doesn't need to be 
+    # different unless one run is being used for both AC and DC, which is a bad
+    # idea
     yl_AC = yl
     yr_AC = yr
 
