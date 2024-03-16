@@ -39,7 +39,13 @@ z_offset = 0
 ac_edgespace = 10
 
 # edge_to_electrode offset, DC, mm
-ac_edgespace = 10
+dc_edgespace = 10
+
+# Laser center to electrode center (horizontal), AC, mm
+ac_ylaseroffset = 10
+
+# Laser center to electrode center (horizontal), DC, mm
+dc_ylaseroffset = 10
 
 #%% SMU Variables
 
@@ -83,7 +89,6 @@ z2port = 2
 # y2port = 3
 # z2port = 4
 
-y2_adjust = 1 # factor 5 to adjust by while the wrong motor is on y2
 
 # encoder
 change_per_cycle = 4

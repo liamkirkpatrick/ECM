@@ -102,15 +102,13 @@ def guibuild():
                 [sg.Column([[sg.Text('Set Up Window',font=("Helvetica", 12, "bold"))]], justification='c')],
                  [sg.Column([[sg.Text(size=(25, 1), key='SETUP_INSTRUCT')]], justification='c')],
                  [sg.Button('Set Z Down', size=(15,1), key='-Z_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-Z_SET-')],
-                 [sg.Button('Set X Zero', size=(15,1), key='-X0_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-X0_SET-')],
+                 [sg.Button('Set X0, Y0', size=(15,1), key='-X0YO_SETUP-', disabled=True), sg.Text('   X Set At: '), sg.Text('not set', size=(8, 1), key='-X0_SET-')],
+                 [sg.Text('                                        Y Set At: '), sg.Text('not set', size=(8, 1), key='-YO_SET-')],
                  [sg.Button('Set X Tiepoint', size=(15,1), key='-XTIE_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-XTIE_SET-')],
                  [sg.Button('Set X Tiepoint 2', size=(15,1), key='-XTIE2_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-XTIE2_SET-')],
                  [sg.Button('Set X Tiepoint 3', size=(15,1), key='-XTIE3_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-XTIE3_SET-')],
-                 [sg.Button('Set X Far', size=(15,1), key='-XMAX_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-XMAX_SET-')],
-                 [sg.Button('Set Y Left ', size=(15,1), key='-YL_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-YL_SET-')],
-                 [sg.Button('Set Y Right ', size=(15,1), key='-YR_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-YR_SET-')],
-                 [sg.Button('Set Y Left (AC)', size=(15,1), key='-YL_AC_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-YL_AC_SET-')],
-                 [sg.Button('Set Y Right (AC)', size=(15,1), key='-YR_AC_SETUP-', disabled=True), sg.Text('     Set At: '), sg.Text('not set', size=(8, 1), key='-YR_AC_SET-')],
+                 [sg.Button('Set X1,Y1', size=(15,1), key='-X1Y1_SETUP-', disabled=True), sg.Text('   X Set At: '), sg.Text('not set', size=(8, 1), key='-Y1_SET-')],
+                 [sg.Text('                                        Y Set At: '), sg.Text('not set', size=(8, 1), key='-Y1_SET-')],
                  [sg.Checkbox('Collect AC', default=True,key='-AC_SELECT-'), sg.Checkbox('Collect DC', default=False, key='-DC_SELECT-'), sg.Button('Continue',key='-ACDC_CONT-')],
                  [sg.Text('Hold Down Button To Move')],
         		 [sg.Text()],
@@ -213,4 +211,4 @@ if __name__=="__main__":
     		
         if event in (sg.WIN_CLOSED, 'Quit'):
             break
-        window.close()
+    window.close()

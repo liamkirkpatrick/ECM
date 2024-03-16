@@ -44,6 +44,7 @@ import keyboard
 # Import functions
 from make_gui_v9 import guibuild, delete_figure, draw_figure, makeplot
 from setup_movement_v6 import setup_mov
+from setup_movement_v6 import setup_movxy
 from getinput import getinput
 
 # Import packages - MCC
@@ -300,15 +301,18 @@ if qt:
 # Decide if we are running AC, DC, or Both
 window['-SETUP_STATUS-'].update('Insert Note. Select AC, DC, or Both')
 window['-ACDC_CONT-'].update(disabled=False)
+
+# toggle on/off
 if True:
+    
+    # check if quit
     if qt:
+        
+        # loop until user entersCO or DC
         while True:
             
             # read
             event, values = window.read(timeout=50)
-            
-            # if event == '-SUMBIT_NOTE-':
-            #     note = window['note'].get()
             
             if event == '-ACDC_CONT-' or keyboard.is_pressed('Enter'):
                 AC_run = window['-AC_SELECT-'].get()
@@ -422,47 +426,48 @@ ul.d_out(board_num, port.type, 128)
 # THIS IS WHERE YOU CAN MANUALLY FORCE SETUP
 # On previous run, note ice dimensions
 # set below to FALSE. Then enter dimensions below. 
-if True:  
-    if qt:
-        [xtie, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
-    if qt:
-        [xmin, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-X0_SETUP-', '-X0_SET-', 'X Minimum', c.x_conv)
-    # if qt:
-    #     [xtie2, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
-    # if qt:
-    #     [xtie3, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-XTIE3_SETUP-', '-XTIE3_SET-', 'X Tiepoint 3', c.x_conv) 
-    xtie2 = 0
-    xtie3 = 0
+if True:
     
+    
+    if DC_run:
+        y_setup = y1_dev
+        z_setup = z1_dev
+        
+    else:
+        y_setup = y2_dev
+        z_setup = z2_dev
+        
+    # move y-axis so there are no length issues
+    y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
+    
+    # bottom left (X0Y0)
+    if qt:
+        [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0Y0_SET-', 'X0Y0')
+
+    if qt:
+        [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
+    
+    #toggle tiepoints 2 and 3
+    if True:
+        if qt:
+            [xtie2, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
+        if qt:
+            [xtie3, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE3_SETUP-', '-XTIE3_SET-', 'X Tiepoint 3', c.x_conv) 
+    else:
+        xtie2 = 0
+        xtie3 = 0
+    
+    # top right (X1Y1)
+    if qt:
+        [xmax,yr,qt] = setup_movxy(window, x_dev,y_setup,z_setup, qt, '-X1Y1_SETUP-', '-X1Y1_SET-', 'X1Y1')
+        
+    # set up z axis 
+    if qt:
+        [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
+
     if qt:
         z1_dev.home()
         z2_dev.home()  
-
-    if qt and DC_run:
-        if qt:
-            [xmax, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, x_dev, qt, '-XMAX_SETUP-', '-XMAX_SET-', 'X Maximum', c.x_conv)
-        if qt:
-            y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
-            [yl, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, y1_dev, qt, '-YL_SETUP-', '-YL_SET-', 'Y Left', 1)
-        if qt:
-            [zup, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, z1_dev, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)  
-        if qt:
-            [yr, qt] = setup_mov(window, x_dev, y1_dev, z1_dev, y1_dev, qt, '-YR_SETUP-', '-YR_SET-', 'Y Right', 1)
-    
-    else:
-        if qt:
-            [xmax, qt] = setup_mov(window, x_dev, y1_dev, z2_dev, x_dev, qt, '-XMAX_SETUP-', '-XMAX_SET-', 'X Maximum', c.x_conv)
-        if qt:
-            y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
-            [yl, qt] = setup_mov(window, x_dev, y2_dev, z2_dev, y2_dev, qt, '-YL_SETUP-', '-YL_SET-', 'Y Left', 1)
-        if qt:
-            [zup, qt] = setup_mov(window, x_dev, y2_dev, z2_dev, z2_dev, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
-        if qt:
-            [yr, qt] = setup_mov(window, x_dev, y2_dev, z2_dev, y2_dev, qt, '-YR_SETUP-', '-YR_SET-', 'Y Right', 1)
-            
-    if qt:
-        yl_AC = yl
-        yr_AC = yr
         
 else:
     zup = 73.77
@@ -474,12 +479,6 @@ else:
     yl = 64.57
     yr = 109.43
     
-    # don't worry about this - just sets y axis for ac. Doesn't need to be 
-    # different unless one run is being used for both AC and DC, which is a bad
-    # idea
-    yl_AC = yl
-    yr_AC = yr
-
 # home z axis
 if qt:
     z1_dev.home()
@@ -509,20 +508,21 @@ window['Submit'].update(disabled=True)
 
 #%% Calculate y-axis section and count threxhold
 
-# First up is to decide which y-axis dimensions to use. I'll assume moving 1cm over for each run
+# First up is to decide which y-axis dimensions to use.
 if qt:
-    ydim = np.array([yl])
-    ydim_AC = np.array([yl_AC])   
+    
+    if DC_run:
+        edgespace = c.dc_edgespace
+    else:
+        edgespace = c.ac_edgespace
+        
+    ydim = np.array([yl+edgespace])
     
     if yl != yr:
-        while ydim[-1] < yr:
+        while ydim[-1] < yr-edgespace:
             ydim = np.append(ydim,ydim[-1]+round(c.y_space))
-        ydim[-1] = yr
+        ydim[-1] = yr-edgespace
         
-    if yl_AC != yr_AC:
-        while ydim_AC[-1] < yr:
-            ydim_AC = np.append(ydim_AC,ydim_AC[-1]+round(c.y_space))
-        ydim_AC[-1] = yr
         
     # Turn on digital output to provide power to button
     ul.d_out(board_num, port.type, 1)
@@ -546,10 +546,11 @@ if qt:
     file_object.write('DC Voltage: '+str(c.voltage)+ ',,,,,\n')
     file_object.write('Note: '+str(note)+ ',,,,,\n')
     file_object.write('mm per encode step: '+str(c.mm_per_step)+ ',,,,,\n')
-    file_object.write('Number of Expected tracks (DC): '+str(len(ydim)+1)+ ',,,,,\n')
-    file_object.write('Number of Expected tracks (AC): '+str(len(ydim_AC)+1)+ ',,,,,\n')
+    file_object.write('Number of Expected tracks: '+str(len(ydim)+1)+ ',,,,,\n')
     file_object.write('ACDC offset: '+str(c.acdc_offset)+ ',,,,,\n')
     file_object.write('Laser offset: '+str(c.laser_offset)+ ',,,,,\n')
+    file_object.write('AC edgespace '+str(c.ac_edgespace)+ ',,,,,\n')
+    file_object.write('DC edgespace '+str(c.dc_edgespace)+ ',,,,,\n')
     file_object.write('Index Mark (raw - not laser corrected): '+str(xtie*c.x_conv)+ ',,,,,\n')
     file_object.write('Index Mark Relative Depth: '+str(tieloc)+ ',,,,,\n')
     file_object.write('Index Mark 2 Relative Depth: '+str(xtie2 * c.x_conv)+',,,,,\n')
@@ -558,7 +559,6 @@ if qt:
     file_object.write('X min Position (raw - not laser corrected): '+str(xmin*c.x_conv)+',,,,,\n')
     file_object.write('X max Position (raw - not laser corrected): '+str(xmax*c.x_conv)+',,,,,\n')
     file_object.write('Y_dimension(mm),X_dimension(mm),Button,AC,DC,True_depth(m)\n')
-    
 
 #%% Setup the Plot
 
@@ -569,14 +569,6 @@ cmap = matplotlib.colormaps.get_cmap('coolwarm')
 
 # Wait for button to start DC run
 if qt and DC_run:
-    
-    # # set up plot
-    # plt.figure(2)
-    # plt.clf()
-    # plt.ion()
-    # plt.title('DC Plot - Live')
-    # plt.xlabel('X Horizontal Dimension (mm)')
-    # plt.ylabel('Conductivity (amps)')
     
     # update window
     window['-START_DC-'].update(disabled=False)
@@ -620,7 +612,7 @@ if qt and DC_run:
                 event, values = window.read(timeout=15)
                 
                 # go to starting position
-                y1_dev.move_absolute(ydim[y], Units.LENGTH_MILLIMETRES)
+                y1_dev.move_absolute(ydim[y]+c.dc_ylaseroffset, Units.LENGTH_MILLIMETRES)
                 x_dev.move_absolute(xmax- (c.laser_offset)/c.x_conv)
                 if zup > 0:
                     z1_dev.move_absolute(zup, Units.LENGTH_MILLIMETRES)
@@ -789,10 +781,7 @@ if qt and DC_run:
                     print("*********************************************************************************")
                 else:
                     print(" Endoder is within 1% of expected distance covered")
-            # if qt:
-            #     plt.legend(np.round(ydim),title='Distance accross core:')
-            #     plt.draw()
-                
+
             # break out of loop to continue with program
             break
             
@@ -832,27 +821,28 @@ if qt and AC_run:
         
         if event == '-START_AC-':
             
+            # move opposite axis so there are no length issues
             y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
             
             # Update GUI
             window['-START_AC-'].update(disabled=True)
             window['-ACDC_STATUS-'].update('Collecting AC Data')
             
-            button_AC = np.empty([int(countmax),int(len(ydim_AC))])
+            button_AC = np.empty([int(countmax),int(len(ydim))])
             button_AC.fill(np.NaN)
             
-            G_AC = np.empty([int(countmax),int(len(ydim_AC))])
+            G_AC = np.empty([int(countmax),int(len(ydim))])
             G_AC.fill(np.NaN)
             
             # loop through all y dimensions for the run
-            for y in np.arange(0,len(ydim_AC)):
+            for y in np.arange(0,len(ydim)):
                 
                 # update status
-                window['-READ_STATUS-'].update('Reading Row at y = '+str(round(ydim_AC[y],3))+' mm')
+                window['-READ_STATUS-'].update('Reading Row at y = '+str(round(ydim[y],3))+' mm')
                 event, values = window.read(timeout=15)
                 
                 # go to starting position
-                y2_dev.move_absolute(ydim_AC[y] / c.y2_adjust, Units.LENGTH_MILLIMETRES)
+                y2_dev.move_absolute(ydim[y] + c.ac_ylaseroffset, Units.LENGTH_MILLIMETRES)
                 x_dev.move_absolute(xmax + (c.acdc_offset - c.laser_offset)/c.x_conv)
                 if zup+c.z_offset > 0:
                     z2_dev.move_absolute(zup+c.z_offset, Units.LENGTH_MILLIMETRES)
@@ -955,7 +945,7 @@ if qt and AC_run:
                         print("Error - Tiepoint depth not valid number")
                     true_depth = f_tieloc + (xmax-xtie)/1000 - i *c.mm_per_step/1000
                     true_depth = 'na'
-                    file_object.write(str(round(ydim_AC[y],3)) + ',' + str(i * c.mm_per_step) + ',' + str(button_AC[i,y]) + ',' + str(G_AC[i,y])+',--,' +str(true_depth)+'\n')
+                    file_object.write(str(round(ydim[y],3)) + ',' + str(i * c.mm_per_step) + ',' + str(button_AC[i,y]) + ',' + str(G_AC[i,y])+',--,' +str(true_depth)+'\n')
                     
              
                 # Plot
@@ -995,7 +985,7 @@ if qt:
     if qt and AC_run:
         plt.figure(3)
         plt.clf()
-        for y in range(0,len(ydim_AC)):
+        for y in range(0,len(ydim)):
             plt.plot(range(0,int(countmax)),G_AC[:,y],color=cmap(y/len(ydim)))
         plt.title('AC Runs')
         plt.show()        
