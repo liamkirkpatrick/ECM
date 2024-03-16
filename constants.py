@@ -24,6 +24,23 @@ x_spd = 40
 y_spd = 10
 z_spd = 10
 
+#%% Spacing Variables
+
+#AC/DC offset, new electrodes, measured at ICF (best measurement))
+acdc_offset = 239.5    
+
+# DC to laser offset, in mm, measured at ICF
+laser_offset = 20.8            
+
+# temp, w/ broken motor
+z_offset = 0 
+
+# edge_to_electrode offset, AC, mm
+ac_edgespace = 10
+
+# edge_to_electrode offset, DC, mm
+ac_edgespace = 10
+
 #%% SMU Variables
 
 voltage = 1000
@@ -76,10 +93,7 @@ mm_per_step = mm_per_rotation / cycles_per_rotation
 # AC/DC offset
 #acdc_offset = 332           # AC/DC electrode x-axis offset, in mm, old electrode
 #acdc_offset = 267           # AC/DC offset, w/ new electrodes
-acdc_offset = 239.5             #AC/DC offset, new electrodes, measured at ICF (best measurement))
-laser_offset = 20.8            # DC to laser offset, in mm, measured at ICF
-z_offset = 0 # temp, w/ broken motor
-#z_offset = -5               # how much lower is z2 than z1
+
 
 
 #%% MCC DAQ
