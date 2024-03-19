@@ -46,6 +46,7 @@ from make_gui_v9 import guibuild, delete_figure, draw_figure, makeplot
 from setup_movement_v6 import setup_mov
 from setup_movement_xandy import setup_movxy
 from getinput import getinput
+from lastdims import loadlast, savelast
 
 # Import packages - MCC
 from mcculw import ul
@@ -422,53 +423,84 @@ window['-SETUP_STATUS-'].update('*** SETUP STARTED ***')
 #mcc_digital(dio_device, port_to_write, 128)
 ul.d_out(board_num, port.type, 128)
 
+# Run values from last time?
+window['-SETUP_STATUS-'].update('Decide if we want to run last or new values')
+window['-LAST_CONT-'].update(disabled=False)
 
-# THIS IS WHERE YOU CAN MANUALLY FORCE SETUP
-# On previous run, note ice dimensions
+    
+# check if quit
+if qt:
+    
+    # loop until user enters to run last or not
+    while True:
+        
+        # read
+        event, values = window.read(timeout=50)
+        
+        if event == '-LAST_CONT-' or keyboard.is_pressed('Enter'):
+            
+            if values['new'] == True:
+                
+                run_last = False
+            
+        elif event in (sg.WIN_CLOSED, 'Quit'):
+                qt = False
+                break
+window['-LAST_CONT-'].update(disabled=True)
+
 # set below to FALSE. Then enter dimensions below. 
-if True:
+if qt:
     
-    
-    if DC_run:
-        y_setup = y1_dev
-        z_setup = z1_dev
+    if run_last:
+        
+        loadlast()
         
     else:
-        y_setup = y2_dev
-        z_setup = z2_dev
+    
+    
+        if DC_run:
+            y_setup = y1_dev
+            z_setup = z1_dev
+            
+        else:
+            y_setup = y2_dev
+            z_setup = z2_dev
+            
+        # move y-axis so there are no length issues
+        y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
         
-    # move y-axis so there are no length issues
-    y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
-    
-    # bottom left (X0Y0)
-    if qt:
-        [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-','-Y0_SET-', 'X0Y0')
-    if qt:
-        [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
-    
-    #toggle tiepoints 2 and 3
-    if True:
+        # bottom left (X0Y0)
         if qt:
-            [xtie2, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
+            [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-','-Y0_SET-', 'X0Y0')
         if qt:
-            [xtie3, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE3_SETUP-', '-XTIE3_SET-', 'X Tiepoint 3', c.x_conv) 
-    else:
-        xtie2 = 0
-        xtie3 = 0
+            [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
+        
+        #toggle tiepoints 2 and 3
+        if True:
+            if qt:
+                [xtie2, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
+            if qt:
+                [xtie3, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE3_SETUP-', '-XTIE3_SET-', 'X Tiepoint 3', c.x_conv) 
+        else:
+            xtie2 = 0
+            xtie3 = 0
+        
+        # top right (X1Y1)
+        if qt:
+            [xmax,yr,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-','-Y1_SET-', 'X1Y1')
+            
+        # set up z axis 
+        if qt:
+            [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
     
-    # top right (X1Y1)
-    if qt:
-        [xmax,yr,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-','-Y1_SET-', 'X1Y1')
+        if qt:
+            z1_dev.home()
+            z2_dev.home()  
+            
+        # save values
+        savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
         
-    # set up z axis 
-    if qt:
-        [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
-
-    if qt:
-        z1_dev.home()
-        z2_dev.home()  
-        
-else:
+if False:
     zup = 73.77
     xmin = 572.35 / c.x_conv
     xtie = 560.66
@@ -477,6 +509,10 @@ else:
     xmax =  727.52 / c.x_conv 
     yl = 64.57
     yr = 109.43
+    
+    # save values
+    savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
+    
     
 # home z axis
 if qt:
@@ -548,6 +584,8 @@ if qt:
     file_object.write('Number of Expected tracks: '+str(len(ydim)+1)+ ',,,,,\n')
     file_object.write('ACDC offset: '+str(c.acdc_offset)+ ',,,,,\n')
     file_object.write('Laser offset: '+str(c.laser_offset)+ ',,,,,\n')
+    file_object.write('Y Left: '+str(yl)+ ',,,,,\n')
+    file_object.write('Y Right: '+str(yr)+ ',,,,,\n')
     file_object.write('AC edgespace '+str(c.ac_edgespace)+ ',,,,,\n')
     file_object.write('DC edgespace '+str(c.dc_edgespace)+ ',,,,,\n')
     file_object.write('Index Mark (raw - not laser corrected): '+str(xtie*c.x_conv)+ ',,,,,\n')
