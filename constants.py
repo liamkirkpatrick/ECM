@@ -13,7 +13,7 @@ import numpy as np
 write_res = 1
 
 # Spacing between runs (on y-axis)
-y_space = 5
+y_space = 10
 
 # data collection speed (mm/s)
 col_spd_DC = 25
@@ -30,7 +30,7 @@ z_spd = 10
 acdc_offset = 239.5    
 
 # DC to laser offset, in mm, measured at ICF
-laser_offset = 20.8            
+laser_offset = -10         
 
 # temp, w/ broken motor
 z_offset = 0 
@@ -42,10 +42,10 @@ ac_edgespace = 10
 dc_edgespace = 10
 
 # Laser center to electrode center (horizontal), AC, mm
-ac_ylaseroffset = 10
+ac_ylaseroffset = 0
 
 # Laser center to electrode center (horizontal), DC, mm
-dc_ylaseroffset = 10
+dc_ylaseroffset = 0
 
 #%% SMU Variables
 

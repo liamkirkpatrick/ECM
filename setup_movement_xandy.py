@@ -21,7 +21,7 @@ except ImportError:
 
 set_deadzone(DEADZONE_TRIGGER,10)
 
-def setup_mov_xy(window,x_dev,y_dev,z_dev, qt, button, outputy, outputx, des):
+def setup_movxy(window,x_dev,y_dev,z_dev, qt, button, outputy, outputx, des):
     
     window['SETUP_INSTRUCT'].update('*** Set ' + des + ' Location ***')
     window[button].update(disabled=False)
@@ -86,7 +86,7 @@ def setup_mov_xy(window,x_dev,y_dev,z_dev, qt, button, outputy, outputx, des):
                 if con_event.button == "X" or con_event.button =="B":
 
                     locy = y_dev.get_position(unit=Units.LENGTH_MILLIMETRES)
-                    locx = x_dev.get_position(unit=Units.LENGTH_MILLIMETRES)
+                    locx = x_dev.get_position(unit=Units.NATIVE)
                 
                     # Print location to GUI window
                     window[outputx].update(str(round(locx * c.x_conv, 2))+' mm')
@@ -122,7 +122,7 @@ def setup_mov_xy(window,x_dev,y_dev,z_dev, qt, button, outputy, outputx, des):
         elif event == button:
                 
             locy = y_dev.get_position(unit=Units.LENGTH_MILLIMETRES)
-            locx = x_dev.get_position(unit=Units.LENGTH_MILLIMETRES)
+            locx = x_dev.get_position(unit=Units.NATIVE)
                 
             # Print location to GUI window
             window[outputx].update(str(round(locx * c.x_conv, 2))+' mm')

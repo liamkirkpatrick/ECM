@@ -44,7 +44,7 @@ import keyboard
 # Import functions
 from make_gui_v9 import guibuild, delete_figure, draw_figure, makeplot
 from setup_movement_v6 import setup_mov
-from setup_movement_v6 import setup_movxy
+from setup_movement_xandy import setup_movxy
 from getinput import getinput
 
 # Import packages - MCC
@@ -438,12 +438,11 @@ if True:
         z_setup = z2_dev
         
     # move y-axis so there are no length issues
-    y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
+    y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
     
     # bottom left (X0Y0)
     if qt:
-        [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0Y0_SET-', 'X0Y0')
-
+        [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-','-Y0_SET-', 'X0Y0')
     if qt:
         [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
     
@@ -459,7 +458,7 @@ if True:
     
     # top right (X1Y1)
     if qt:
-        [xmax,yr,qt] = setup_movxy(window, x_dev,y_setup,z_setup, qt, '-X1Y1_SETUP-', '-X1Y1_SET-', 'X1Y1')
+        [xmax,yr,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-','-Y1_SET-', 'X1Y1')
         
     # set up z axis 
     if qt:
