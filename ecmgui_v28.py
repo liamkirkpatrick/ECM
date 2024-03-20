@@ -442,6 +442,10 @@ if qt:
             if values['new'] == True:
                 
                 run_last = False
+            else:
+                run_last = True
+                
+            break
             
         elif event in (sg.WIN_CLOSED, 'Quit'):
                 qt = False
@@ -453,7 +457,7 @@ if qt:
     
     if run_last:
         
-        loadlast()
+        yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup = loadlast()
         
     else:
     
@@ -476,7 +480,7 @@ if qt:
             [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
         
         #toggle tiepoints 2 and 3
-        if True:
+        if False:
             if qt:
                 [xtie2, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
             if qt:

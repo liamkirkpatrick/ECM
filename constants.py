@@ -13,7 +13,7 @@ import numpy as np
 write_res = 1
 
 # Spacing between runs (on y-axis)
-y_space = 10
+y_space = 12
 
 # data collection speed (mm/s)
 col_spd_DC = 25
@@ -27,7 +27,9 @@ z_spd = 10
 #%% Spacing Variables
 
 #AC/DC offset, new electrodes, measured at ICF (best measurement))
-acdc_offset = 239.5    
+#acdc_offset = 239.5
+# old electrodes
+acdc_offset = 305
 
 # DC to laser offset, in mm, measured at ICF
 laser_offset = -10         
@@ -36,7 +38,7 @@ laser_offset = -10
 z_offset = 0 
 
 # edge_to_electrode offset, AC, mm
-ac_edgespace = 10
+ac_edgespace = 17
 
 # edge_to_electrode offset, DC, mm
 dc_edgespace = 10
@@ -61,7 +63,7 @@ SMU_sample_time = 0.0169444
 
 #%% plot variables
 pltmin = 0
-pltmax = 4 * 10**(-6)
+pltmax = 8 * 10**(-6)
 ACpltmin = 0
 ACpltmax = 0.00001/100
 
