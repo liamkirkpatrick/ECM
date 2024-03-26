@@ -62,7 +62,10 @@ def makeplot(xinput,array,ydim,ACorDC):
     ax.set_xlabel('Conductivity',fontsize=6)
     
     if ACorDC =='DC':
-        ax.set_xlim(0,np.percentile(array,95)+10**(-7))
+        try:
+            ax.set_xlim(0,np.percentile(array,95)+10**(-7))
+        except:
+            print("Axis label error")
     return(fig)
 
 #%% delete figure

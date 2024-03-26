@@ -13,7 +13,7 @@ import numpy as np
 write_res = 1
 
 # Spacing between runs (on y-axis)
-y_space = 12
+y_space = 10
 
 # data collection speed (mm/s)
 col_spd_DC = 25
@@ -38,7 +38,7 @@ laser_offset = -10
 z_offset = 0 
 
 # edge_to_electrode offset, AC, mm
-ac_edgespace = 17
+ac_edgespace = 18
 
 # edge_to_electrode offset, DC, mm
 dc_edgespace = 10
