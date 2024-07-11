@@ -13,16 +13,16 @@ import numpy as np
 write_res = 1
 
 # Spacing between runs (on y-axis)
-y_space = 10
+y_space = 20
 
 # data collection speed (mm/s)
 col_spd_DC = 25
 col_spd_AC = 10
 
 # axis default speeds (mm/s)
-x_spd = 40
-y_spd = 10
-z_spd = 10
+x_spd = 50
+y_spd = 12
+z_spd = 12
 
 #%% Spacing Variables
 

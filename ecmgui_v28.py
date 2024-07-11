@@ -182,22 +182,22 @@ try:
         
         print("Attempting to Home Z2")
         z2_dev = device_list[c.z2port]
-        z2_dev.generic_command(CommandCode.SET_HOME_SPEED, 1000)
+        z2_dev.generic_command(CommandCode.SET_HOME_SPEED, 1100)
         # z2_dev.generic_command_with_unit(CommandCode.SET_HOME_SPEED,
         #                                  15,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         z2_dev.home()
-        z2_dev.generic_command(CommandCode.SET_TARGET_SPEED,1000)
+        z2_dev.generic_command(CommandCode.SET_TARGET_SPEED,1100)
         #z2_dev.generic_command_with_unit(CommandCode.SET_TARGET_SPEED,
         #                                 15,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         print("Finished Homing Z2")
         
         print("Attempting to Home Z1")
         z1_dev = device_list[c.z1port]
-        z1_dev.generic_command(CommandCode.SET_HOME_SPEED, 3000)
+        z1_dev.generic_command(CommandCode.SET_HOME_SPEED, 3300)
         #z1_dev.generic_command_with_unit(CommandCode.SET_HOME_SPEED,5,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         z1_dev.home()
         print("Finished Homing Z1")
-        z1_dev.generic_command(CommandCode.SET_TARGET_SPEED, 3000)
+        z1_dev.generic_command(CommandCode.SET_TARGET_SPEED, 3300)
         #z1_dev.generic_command_with_unit(CommandCode.SET_TARGET_SPEED,5,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         
         # Assign devices
@@ -1016,10 +1016,26 @@ if qt and AC_run:
             break     
     
 if qt:
-    try:
-        z2_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
-    except:
-        z2_dev.home()
+    print("Attempting to Home Z2")
+    z2_dev.home()
+    print("Finished Homing Z2")
+    
+    print("Attempting to Home Z1")
+    z1_dev.home()
+    print("Finished Homing Z1")
+    
+    # Assign devices
+    print("Attempting to Home X")      
+    x_dev.home()
+    print("Finished Homing X")
+    
+    print("Attempting to Home Y1")
+    y1_dev.home()
+    print("Finished Homing Y1")
+
+    print("Attempting to Home Y2")
+    y2_dev.home()
+    print("Finished Homing Y2")
 
 if qt:
     # make summary plot
@@ -1040,6 +1056,9 @@ ul.d_out(board_num, port.type, 0)
 
 #%% End Session
 # ==========================================================================================================
+
+
+       
 
 # close the window - waiting for quit
 while True:
