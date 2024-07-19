@@ -321,6 +321,16 @@ if True:
                 while keyboard.is_pressed('Enter'):
                     time.sleep(0.5)
                 break
+            
+                if values['-AC_SELECT-'] == True:
+                    
+                    AC_run = True
+                    DC_run = False
+                else:
+                    AC_run = False
+                    DC_run = True
+                
+                
             elif event in (sg.WIN_CLOSED, 'Quit'):
                     qt = False
                     break
@@ -462,13 +472,13 @@ if qt:
     else:
     
     
-        if DC_run:
-            y_setup = y1_dev
-            z_setup = z1_dev
+        # if DC_run:
+        y_setup = y1_dev
+        z_setup = z1_dev
             
-        else:
-            y_setup = y2_dev
-            z_setup = z2_dev
+        # else:
+        #     y_setup = y2_dev
+        #     z_setup = z2_dev
             
         # move y-axis so there are no length issues
         y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
@@ -550,27 +560,39 @@ window['Submit'].update(disabled=True)
 # First up is to decide which y-axis dimensions to use.
 if qt:
     
-    if DC_run:
-        edgespace = c.dc_edgespace
+    # toggle false for firn core
+    if True:
+    
+        if DC_run:
+            edgespace = c.dc_edgespace
+        else:
+            edgespace = c.ac_edgespace
+            
+        ydim = np.array([yl+edgespace])
+        
+        if yl != yr:
+            while ydim[-1] < yr-edgespace:
+                ydim = np.append(ydim,ydim[-1]+round(c.y_space))
+            ydim[-1] = yr-edgespace
+            
+            
+        # Turn on digital output to provide power to button
+        ul.d_out(board_num, port.type, 1)
+            
+        # calculate count threshold (to know when the run is complete)
+        cnt_threshold = round(c.cycles_per_rotation / c.mm_per_rotation / c.write_res)
+        window['-WRITE_RES-'].update("Writing Every "+str(cnt_threshold)+" Cycles")
+    
+    # firn core
     else:
-        edgespace = c.ac_edgespace
         
-    ydim = np.array([yl+edgespace])
-    
-    if yl != yr:
-        while ydim[-1] < yr-edgespace:
-            ydim = np.append(ydim,ydim[-1]+round(c.y_space))
-        ydim[-1] = yr-edgespace
-        
-        
-    # Turn on digital output to provide power to button
-    ul.d_out(board_num, port.type, 1)
-        
-    # calculate count threshold (to know when the run is complete)
-    cnt_threshold = round(c.cycles_per_rotation / c.mm_per_rotation / c.write_res)
-    window['-WRITE_RES-'].update("Writing Every "+str(cnt_threshold)+" Cycles")
+        if AC_run:
+            ydim = [(yl+yr)/2 - c.y_space, (yl+yr)/2, (yl+yr)/2+c.y_space]
+        else:
+            ydim = [(yl+yr)/2]
     
     
+
 #calculate total number of counts
 if qt:
     countmax = np.floor((xmax-xmin) * c.x_conv * c.cycles_per_rotation / c.mm_per_rotation)
@@ -963,7 +985,7 @@ if qt and AC_run:
                 x_dev.stop()
                 time.sleep(0.5)
                 try:
-                    z2_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                    z2_dev.move_relative(-40,Units.LENGTH_MILLIMETRES)
                 except:
                     z2_dev.home() 
             
@@ -990,8 +1012,6 @@ if qt and AC_run:
                     
              
                 # Plot
-                #plt.plot(np.arange(0,countmax) * c.mm_per_step,G_AC[:,y],color=cmap(y/len(ydim)))
-                #plt.draw()
                 if y > 0:
                     delete_figure(tkcanvas)
                 fig = makeplot(np.arange(0,countmax) * c.mm_per_step,G_AC,ydim,'AC')
@@ -1002,11 +1022,7 @@ if qt and AC_run:
                 if event in (sg.WIN_CLOSED, 'Quit'):
                     qt = False
                     break
-                
-            # # add legend
-            # if qt:
-            #     plt.legend(np.round(ydim),title='Distance accross core:')
-            #     plt.draw()
+            
                 
             # break out of loop to continue with code
             break
@@ -1056,9 +1072,6 @@ ul.d_out(board_num, port.type, 0)
 
 #%% End Session
 # ==========================================================================================================
-
-
-       
 
 # close the window - waiting for quit
 while True:
