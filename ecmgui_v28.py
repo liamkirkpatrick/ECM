@@ -309,21 +309,25 @@ if True:
     # check if quit
     if qt:
         
-        # loop until user entersCO or DC
+        # loop until user enters AC or DC
         while True:
             
             # read
             event, values = window.read(timeout=50)
             
             if event == '-ACDC_CONT-' or keyboard.is_pressed('Enter'):
-                AC_run = window['-AC_SELECT-'].get()
-                DC_run = window['-DC_SELECT-'].get()
+                
+                #AC_run = window['-AC_SELECT-'].get()
+                #DC_run = window['-DC_SELECT-'].get()
+                
                 while keyboard.is_pressed('Enter'):
                     time.sleep(0.5)
                 break
             
-                if values['-AC_SELECT-'] == True:
-                    
+                if values['-ACDC_SELECT-'] == True:
+                    AC_run = True
+                    DC_run = True
+                elif values['-AC_SELECT-'] == True:      
                     AC_run = True
                     DC_run = False
                 else:
@@ -334,10 +338,12 @@ if True:
             elif event in (sg.WIN_CLOSED, 'Quit'):
                     qt = False
                     break
+                
 window['-ACDC_CONT-'].update(disabled=True)
 
 #%% Connect to SMU
 
+# check if quit
 if qt:
     try:
     
@@ -471,14 +477,8 @@ if qt:
         
     else:
     
-    
-        # if DC_run:
         y_setup = y1_dev
         z_setup = z1_dev
-            
-        # else:
-        #     y_setup = y2_dev
-        #     z_setup = z2_dev
             
         # move y-axis so there are no length issues
         y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
@@ -560,8 +560,9 @@ window['Submit'].update(disabled=True)
 # First up is to decide which y-axis dimensions to use.
 if qt:
     
-    # toggle false for firn core
-    if True:
+    # !!! T.J. THIS IS WHERE YOU CHANGE THE TRACKS !!!!
+    # toggle false for firn core or manually specifying tracks
+    if False:
     
         if DC_run:
             edgespace = c.dc_edgespace
@@ -582,14 +583,16 @@ if qt:
         # calculate count threshold (to know when the run is complete)
         cnt_threshold = round(c.cycles_per_rotation / c.mm_per_rotation / c.write_res)
         window['-WRITE_RES-'].update("Writing Every "+str(cnt_threshold)+" Cycles")
+        
+        ACydim = ydim
+        DCydim = ydim
     
-    # firn core
+    # firn core (OR manually setting tracks)
     else:
         
-        if AC_run:
-            ydim = [(yl+yr)/2 - c.y_space, (yl+yr)/2, (yl+yr)/2+c.y_space]
-        else:
-            ydim = [(yl+yr)/2]
+        # manually set track coordinates (y dimension). The below setup 
+        ACydim = [(yl+yr)/2 - c.y_space, (yl+yr)/2, (yl+yr)/2+c.y_space]
+        DCydim = [(yl+yr)/2]
     
     
 
@@ -632,6 +635,8 @@ cmap = matplotlib.colormaps.get_cmap('coolwarm')
 
 # Wait for button to start DC run
 if qt and DC_run:
+    
+    ydim = DCydim
     
     # update window
     window['-START_DC-'].update(disabled=False)
@@ -867,6 +872,9 @@ if qt:
 
 # Wait for button to start run
 if qt and AC_run:
+    
+    ydim = ACydim
+    
     window['-START_AC-'].update(disabled=False)
     window['-ACDC_STATUS-'].update('Waiting to start AC Run')
     
@@ -985,7 +993,7 @@ if qt and AC_run:
                 x_dev.stop()
                 time.sleep(0.5)
                 try:
-                    z2_dev.move_relative(-40,Units.LENGTH_MILLIMETRES)
+                    z2_dev.move_relative(-50,Units.LENGTH_MILLIMETRES)
                 except:
                     z2_dev.home() 
             
