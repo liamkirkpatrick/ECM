@@ -200,15 +200,7 @@ try:
         z1_dev.generic_command(CommandCode.SET_TARGET_SPEED, 3300)
         #z1_dev.generic_command_with_unit(CommandCode.SET_TARGET_SPEED,5,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         
-        # Assign devices
-        print("Attempting to Home X")      
-        x_dev = device_list[c.xport]
-        #x_dev.generic_command(CommandCode.SET_HOME_SPEED, 7000)
-        x_dev.home()
-        x_dev.generic_command(CommandCode.SET_HOME_SPEED, 2000)
-        x_dev.generic_command(CommandCode.SET_TARGET_SPEED, round(c.x_spd / c.xv_conv))
-        x_dev.generic_command(CommandCode.SET_MICROSTEP_RESOLUTION, 64)
-        print("Finished Homing X")
+
         
         print("Attempting to Home Y1")
         y1_dev = device_list[c.y1port]
@@ -223,7 +215,17 @@ try:
         y2_dev.home()
         print("Finished Homing Y2")
         y2_dev.generic_command_with_units(CommandCode.SET_TARGET_SPEED, 20, Units.VELOCITY_MILLIMETRES_PER_SECOND)
-                
+        
+
+        # Assign devices
+        print("Attempting to Home X")      
+        x_dev = device_list[c.xport]
+        #x_dev.generic_command(CommandCode.SET_HOME_SPEED, 7000)
+        x_dev.home()
+        x_dev.generic_command(CommandCode.SET_HOME_SPEED, 2000)
+        x_dev.generic_command(CommandCode.SET_TARGET_SPEED, round(c.x_spd / c.xv_conv))
+        x_dev.generic_command(CommandCode.SET_MICROSTEP_RESOLUTION, 64)
+        print("Finished Homing X")        
 except Exception:
 
     # if False (connection fails):
@@ -309,41 +311,25 @@ if True:
     # check if quit
     if qt:
         
-        # loop until user enters AC or DC
+        # loop until user entersCO or DC
         while True:
             
             # read
             event, values = window.read(timeout=50)
             
             if event == '-ACDC_CONT-' or keyboard.is_pressed('Enter'):
-                
-                #AC_run = window['-AC_SELECT-'].get()
-                #DC_run = window['-DC_SELECT-'].get()
-                
+                AC_run = window['-AC_SELECT-'].get()
+                DC_run = window['-DC_SELECT-'].get()
                 while keyboard.is_pressed('Enter'):
                     time.sleep(0.5)
                 break
-            
-                if values['-ACDC_SELECT-'] == True:
-                    AC_run = True
-                    DC_run = True
-                elif values['-AC_SELECT-'] == True:      
-                    AC_run = True
-                    DC_run = False
-                else:
-                    AC_run = False
-                    DC_run = True
-                
-                
             elif event in (sg.WIN_CLOSED, 'Quit'):
                     qt = False
                     break
-                
 window['-ACDC_CONT-'].update(disabled=True)
 
 #%% Connect to SMU
 
-# check if quit
 if qt:
     try:
     
@@ -477,8 +463,16 @@ if qt:
         
     else:
     
-        y_setup = y1_dev
-        z_setup = z1_dev
+    
+        if DC_run:
+            y_setup = y1_dev
+            z_setup = z1_dev
+            
+        else:
+            #y_setup = y2_dev
+            #z_setup = z2_dev
+            y_setup = y1_dev
+            z_setup = z1_dev
             
         # move y-axis so there are no length issues
         y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
@@ -505,7 +499,8 @@ if qt:
             
         # set up z axis 
         if qt:
-            [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
+            #[zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
+            zup=71
     
         if qt:
             z1_dev.home()
@@ -514,19 +509,6 @@ if qt:
         # save values
         savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
         
-if False:
-    zup = 73.77
-    xmin = 572.35 / c.x_conv
-    xtie = 560.66
-    xtie2 = 0 / c.x_conv 
-    xtie3 = 0 / c.x_conv 
-    xmax =  727.52 / c.x_conv 
-    yl = 64.57
-    yr = 109.43
-    
-    # save values
-    savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
-    
     
 # home z axis
 if qt:
@@ -554,48 +536,32 @@ window['-Y_UP-'].update(disabled=True)
 window['-Y_DOWN-'].update(disabled=True)
 window['Submit'].update(disabled=True)
 
-
 #%% Calculate y-axis section and count threxhold
 
 # First up is to decide which y-axis dimensions to use.
 if qt:
     
-    # !!! T.J. THIS IS WHERE YOU CHANGE THE TRACKS !!!!
-    # toggle false for firn core or manually specifying tracks
-    if False:
-    
-        if DC_run:
-            edgespace = c.dc_edgespace
-        else:
-            edgespace = c.ac_edgespace
-            
-        ydim = np.array([yl+edgespace])
-        
-        if yl != yr:
-            while ydim[-1] < yr-edgespace:
-                ydim = np.append(ydim,ydim[-1]+round(c.y_space))
-            ydim[-1] = yr-edgespace
-            
-            
-        # Turn on digital output to provide power to button
-        ul.d_out(board_num, port.type, 1)
-            
-        # calculate count threshold (to know when the run is complete)
-        cnt_threshold = round(c.cycles_per_rotation / c.mm_per_rotation / c.write_res)
-        window['-WRITE_RES-'].update("Writing Every "+str(cnt_threshold)+" Cycles")
-        
-        ACydim = ydim
-        DCydim = ydim
-    
-    # firn core (OR manually setting tracks)
+    if DC_run:
+        edgespace = c.dc_edgespace
     else:
+        edgespace = c.ac_edgespace
         
-        # manually set track coordinates (y dimension). The below setup 
-        ACydim = [(yl+yr)/2 - c.y_space, (yl+yr)/2, (yl+yr)/2+c.y_space]
-        DCydim = [(yl+yr)/2]
+    ydim = np.array([yl+edgespace])
+    
+    if yl != yr:
+        while ydim[-1] < yr-edgespace:
+            ydim = np.append(ydim,ydim[-1]+round(c.y_space))
+        ydim[-1] = yr-edgespace
+        
+        
+    # Turn on digital output to provide power to button
+    ul.d_out(board_num, port.type, 1)
+        
+    # calculate count threshold (to know when the run is complete)
+    cnt_threshold = round(c.cycles_per_rotation / c.mm_per_rotation / c.write_res)
+    window['-WRITE_RES-'].update("Writing Every "+str(cnt_threshold)+" Cycles")
     
     
-
 #calculate total number of counts
 if qt:
     countmax = np.floor((xmax-xmin) * c.x_conv * c.cycles_per_rotation / c.mm_per_rotation)
@@ -635,8 +601,6 @@ cmap = matplotlib.colormaps.get_cmap('coolwarm')
 
 # Wait for button to start DC run
 if qt and DC_run:
-    
-    ydim = DCydim
     
     # update window
     window['-START_DC-'].update(disabled=False)
@@ -691,13 +655,13 @@ if qt and DC_run:
                 cnt = 0
                 
                 # set current encoder state
-                if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range)) > 1:
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range))) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                         state = 3;
                     else:
                         state = 2;
                 else:
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                         state = 1;
                     else:
                         state = 0;
@@ -729,13 +693,13 @@ if qt and DC_run:
                     # here we check to see if the encoder sees movement. Start
                     # by getting the current state of the encoder (2 channels,
                     # each at high or low voltage)
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range)) > 1:
-                        if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range))) > 1:
+                        if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                             state = 3
                         else:
                             state = 2
                     else:
-                        if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                        if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                             state = 1
                         else:
                             state = 0
@@ -748,7 +712,7 @@ if qt and DC_run:
                         #print(str(cnt))
                         
                         # check button
-                        button[cnt-1,y] = ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.button_channel, ai_range)) < 1
+                        button[cnt-1,y] = abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.button_channel, ai_range))) < 1
 
                         
                         timer[cnt-1,y] = time.time()
@@ -857,6 +821,29 @@ if qt and DC_run:
         elif event in (sg.WIN_CLOSED, 'Quit'):
             qt = False
             break
+        
+    if qt:
+        print("Attempting to Home Z2")
+        z2_dev.home()
+        print("Finished Homing Z2")
+        
+        print("Attempting to Home Z1")
+        z1_dev.home()
+        print("Finished Homing Z1")
+        
+        # Assign devices
+        print("Attempting to Home X")      
+        x_dev.home()
+        print("Finished Homing X")
+        
+        print("Attempting to Home Y1")
+        y1_dev.home()
+        print("Finished Homing Y1")
+    
+        print("Attempting to Home Y2")
+        y2_dev.home()
+        print("Finished Homing Y2")
+
 
 if qt:
     # make summary plot
@@ -872,18 +859,8 @@ if qt:
 
 # Wait for button to start run
 if qt and AC_run:
-    
-    ydim = ACydim
-    
     window['-START_AC-'].update(disabled=False)
     window['-ACDC_STATUS-'].update('Waiting to start AC Run')
-    
-    # plt.figure(1)
-    # plt.clf()
-    # plt.ion()
-    # plt.title('AC Plot - Live')
-    # plt.xlabel('X Horizontal Dimension (mm)')
-    # plt.ylabel('Conductivity (amps)')
     
     while True:
     
@@ -929,13 +906,13 @@ if qt and AC_run:
                 raw_cnt = 0;
                 
                 # set current encoder state
-                if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range)) > 1:
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range))) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                         state = 3;
                     else:
                         state = 2;
                 else:
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                         state = 1;
                     else:
                         state = 0;
@@ -961,13 +938,13 @@ if qt and AC_run:
                     stateprior = state;
                     
                     # here we check to see if the encoder sees movement
-                    if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range)) > 1:
-                        if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                    if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[0], ai_range))) > 1:
+                        if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                             state = 3
                         else:
                             state = 2
                     else:
-                        if ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range)) > 1:
+                        if abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.encode_channel[1], ai_range))) > 1:
                             state = 1
                         else:
                             state = 0
@@ -980,7 +957,7 @@ if qt and AC_run:
                         #print(str(cnt))
                         
                         # check button
-                        button_AC[cnt-1,y] = ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.button_channel, ai_range)) < 1
+                        button_AC[cnt-1,y] = abs(ul.to_eng_units(0, ai_range, ul.a_in(board_num, c.button_channel, ai_range))) < 1
 
                         # save value
                         G_AC[cnt-1,y] = np.nanmean(G_raw)
@@ -1020,6 +997,8 @@ if qt and AC_run:
                     
              
                 # Plot
+                #plt.plot(np.arange(0,countmax) * c.mm_per_step,G_AC[:,y],color=cmap(y/len(ydim)))
+                #plt.draw()
                 if y > 0:
                     delete_figure(tkcanvas)
                 fig = makeplot(np.arange(0,countmax) * c.mm_per_step,G_AC,ydim,'AC')
@@ -1030,7 +1009,11 @@ if qt and AC_run:
                 if event in (sg.WIN_CLOSED, 'Quit'):
                     qt = False
                     break
-            
+                
+            # # add legend
+            # if qt:
+            #     plt.legend(np.round(ydim),title='Distance accross core:')
+            #     plt.draw()
                 
             # break out of loop to continue with code
             break
@@ -1039,27 +1022,27 @@ if qt and AC_run:
             qt = False
             break     
     
-if qt:
-    print("Attempting to Home Z2")
-    z2_dev.home()
-    print("Finished Homing Z2")
+    if qt:
+        print("Attempting to Home Z2")
+        z2_dev.home()
+        print("Finished Homing Z2")
+        
+        print("Attempting to Home Z1")
+        z1_dev.home()
+        print("Finished Homing Z1")
+        
+        # Assign devices
+        print("Attempting to Home X")      
+        x_dev.home()
+        print("Finished Homing X")
+        
+        print("Attempting to Home Y1")
+        y1_dev.home()
+        print("Finished Homing Y1")
     
-    print("Attempting to Home Z1")
-    z1_dev.home()
-    print("Finished Homing Z1")
-    
-    # Assign devices
-    print("Attempting to Home X")      
-    x_dev.home()
-    print("Finished Homing X")
-    
-    print("Attempting to Home Y1")
-    y1_dev.home()
-    print("Finished Homing Y1")
-
-    print("Attempting to Home Y2")
-    y2_dev.home()
-    print("Finished Homing Y2")
+        print("Attempting to Home Y2")
+        y2_dev.home()
+        print("Finished Homing Y2")
 
 if qt:
     # make summary plot
@@ -1080,6 +1063,7 @@ ul.d_out(board_num, port.type, 0)
 
 #%% End Session
 # ==========================================================================================================
+
 
 # close the window - waiting for quit
 while True:

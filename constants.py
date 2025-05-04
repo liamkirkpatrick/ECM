@@ -12,8 +12,8 @@ import numpy as np
 # Write Resolution (mm)
 write_res = 1
 
-# Spacing between runs (on y-axis)
-y_space = 20
+# Spacing between tracks (on y-axis)
+y_space = 8.5
 
 # data collection speed (mm/s)
 col_spd_DC = 25
@@ -21,8 +21,8 @@ col_spd_AC = 10
 
 # axis default speeds (mm/s)
 x_spd = 50
-y_spd = 12
-z_spd = 12
+y_spd = 15
+z_spd = 15
 
 #%% Spacing Variables
 
@@ -38,7 +38,7 @@ laser_offset = -10
 z_offset = 0 
 
 # edge_to_electrode offset, AC, mm
-ac_edgespace = 18
+ac_edgespace = 16
 
 # edge_to_electrode offset, DC, mm
 dc_edgespace = 10
