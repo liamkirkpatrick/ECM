@@ -44,6 +44,6 @@ def getinput(window,button_key,box_key,status):
     window[button_key].update(disabled=True)
     
     while keyboard.is_pressed('Enter'):
-        time.sleep(0.5)
+        time.sleep(0.25)
 	
     return txtinput, qt
