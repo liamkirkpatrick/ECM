@@ -105,6 +105,7 @@ def guibuild():
         [sg.Text('Move Y Rel', size=(10, 1)), sg.InputText(size=(6, 1), key='Y_rel'), sg.Text('Move Y Abs', size=(10, 1)), sg.InputText(size=(6, 1), key='Y_abs')],
         [sg.Text('Move Z Rel', size=(10, 1)), sg.InputText(size=(6, 1), key='Z_rel'), sg.Text('Move Z Abs', size=(10, 1)), sg.InputText(size=(6, 1), key='Z_abs')],
         [sg.Text('Press submit to enact move: '), sg.Submit()],
+        [sg.Column([[sg.Quit(button_color=(sg.theme_button_color()[1], sg.theme_button_color()[0]), focus=True)]], justification='r')],
     ]
 
     admin_col = [
@@ -131,7 +132,6 @@ def guibuild():
         [sg.Text("Write Resolution: ", size=(20, 1), justification='r'), sg.Text(size=(20, 1), key='-WRITE_RES-', justification='c')],
         [sg.Text("AC/DC Status: ", size=(20, 1), justification='r'), sg.Text(size=(20, 1), key='-ACDC_STATUS-', justification='c')],
         [sg.Button('Begin AC Run (enter)', key='-START_AC-'), sg.Button('Begin DC Run (enter)', key='-START_DC-')],
-        [sg.Column([[sg.Quit(button_color=(sg.theme_button_color()[1], sg.theme_button_color()[0]), focus=True)]], justification='r')],
     ]
 
     layout = [[sg.Column(first_col), sg.VSeparator(), sg.Column(admin_col), sg.VSeparator(), sg.Column(second_col)]]
