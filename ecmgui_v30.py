@@ -66,6 +66,10 @@ import constants as c
 import glob
 
 
+def update_step_status(window, message):
+    window['-STEP_STATUS-'].update(message)
+
+
 
 def main():
     #%%  Basic settup
@@ -92,10 +96,10 @@ def main():
     #%% Set default Status reports, lock buttons
     # ==========================================================================================================
 
+    update_step_status(window, 'Preparing hardware connections.')
     window['-RUN_STATUS-'].update('')
     window['-CON_STATUS-'].update('')
     window['-MCC_STATUS-'].update('')
-    window['-READ_STATUS-'].update('')
     window['-STATUS-'].update('')
     window['-WRITE_RES-'].update('')
     window['-SETUP_STATUS-'].update('')
@@ -116,6 +120,7 @@ def main():
     #%% Create a folder for today
     # ==========================================================================================================
 
+    update_step_status(window, 'Creating today\'s run folder.')
     fldr = datetime.datetime.now().strftime("%Y-%m-%d")
     #parent = "/Users/Liam/Desktop/UW/ECM/run_outputs/"
     parent = r"\Users\agu\Desktop\run_outputs"
@@ -133,6 +138,7 @@ def main():
     #%% attempt to connect to MCC
     # ==========================================================================================================
 
+    update_step_status(window, 'Connecting to MCC.')
     try:
         board_num = 0
         channel = 0
@@ -177,6 +183,7 @@ def main():
     #%% attempt to connect to zaber. If there is no connection, return an error message
     # ==========================================================================================================
 
+    update_step_status(window, 'Connecting to Zaber motors.')
     try:
         # if True:
         connection = Connection.open_serial_port("COM3")
@@ -254,6 +261,8 @@ def main():
 
     if qt:
 
+        update_step_status(window, 'Step 1: Choose New Section, Repeat Last, or Switch AC/DC.')
+
         window['-NEW-'].update(disabled=False)
         window['-FLIP-'].update(disabled=False)
         window['-SAME-'].update(disabled=False)
@@ -289,6 +298,8 @@ def main():
     # ==========================================================================================================
 
     if qt and repeat:
+
+        update_step_status(window, 'Loaded last values. Review the admin fields, then continue.')
 
         # set run_last to true
         run_last = True
@@ -366,24 +377,28 @@ def main():
 
     # Get Tube:
     if qt and set_new:
+        update_step_status(window, 'Step 2: Enter tube information in the admin window.')
         window['tube'].update(c.autofill_label)
         [tube, qt] = getinput(window,'-SUBMIT_TUBE-','tube','TUBE')
 
     # Get Index Mark (relative):
     if qt and set_new:
+        update_step_status(window, 'Step 3: Enter index mark relative location.')
         [tieloc, qt] = getinput(window,'-SUBMIT_TIELOC-','tieloc','INDEX MARK (RELATIVE)')
 
     # Get Index Mark (depth):
     if qt and set_new:
+        update_step_status(window, 'Step 4: Enter index mark depth.')
         [depth, qt] = getinput(window,'-SUBMIT_DEPTH-','depth','INDEX MARK (DEPTH)')
 
     # Get Note:
     if qt and set_new:
+        update_step_status(window, 'Step 5: Enter notes for this run.')
         [note, qt] = getinput(window,'-SUBMIT_NOTE-','note','NOTE')
 
     # Check setup (repeat or new)
     if qt and set_new:
-        window['-SETUP_STATUS-'].update('Select AC, DC, or Both')
+        update_step_status(window, 'Step 6: Select AC or DC electrodes.')
         window['-ACDC_CONT-'].update(disabled=False)
         # loop until user enters to run last or not
         while True:
@@ -406,7 +421,7 @@ def main():
 
     # Check setup (repeat or new)
     if qt and set_new:
-        window['-SETUP_STATUS-'].update('Decide if we want to run last or new values')
+        update_step_status(window, 'Step 7: Choose new setup or use last values.')
         window['-LAST_CONT-'].update(disabled=False)
         # loop until user enters to run last or not
         while True:
@@ -444,6 +459,7 @@ def main():
     # ==========================================================================================================
 
     if qt and DC_run:
+        update_step_status(window, 'Connecting to SMU for DC run.')
         try:
     
             rm = pyvisa.ResourceManager()
@@ -494,6 +510,7 @@ def main():
         rm.list_resources()
     
     if qt and AC_run:
+        update_step_status(window, 'Connecting to LCR for AC run.')
         try:
             lcr = rm.open_resource("USB0::0x0957::0x0909::MY46100776::INSTR")
             lcr.write("*rst; *cls")
@@ -546,6 +563,7 @@ def main():
         else:
 
             # Unlock Move Buttons
+            update_step_status(window, 'Step 8: Use the setup window to set the sample boundaries.')
             window['-Z_UP-'].update(disabled=False)
             window['-Z_DOWN-'].update(disabled=False)
             window['-X_UP-'].update(disabled=False)
@@ -576,8 +594,10 @@ def main():
         
             # bottom left (X0Y0)
             if qt:
+                update_step_status(window, 'Step 8a: Set X0/Y0 in the setup window.')
                 [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-','-Y0_SET-', 'X0Y0')
             if qt:
+                update_step_status(window, 'Step 8b: Set the X tiepoint in the setup window.')
                 [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
         
             #toggle tiepoints 2 and 3
@@ -592,10 +612,12 @@ def main():
         
             # top right (X1Y1)
             if qt:
+                update_step_status(window, 'Step 8c: Set X1/Y1 in the setup window.')
                 [xmax,yr,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-','-Y1_SET-', 'X1Y1')
             
             # set up z axis 
             if qt:
+                update_step_status(window, 'Step 8d: Set Z height in the setup window.')
                 [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
                 #zup=71
     
@@ -633,7 +655,7 @@ def main():
             window['Submit'].update(disabled=True)
 
     # update status
-    window['-SETUP_STATUS-'].update('Setup Complete')
+    update_step_status(window, 'Setup complete. Press Begin AC Run or Begin DC Run to start acquisition.')
     event, values = window.read(timeout=15)
 
     # Move to xmax positions
@@ -715,6 +737,7 @@ def main():
         # update window
         window['-START_DC-'].update(disabled=False)
         window['-ACDC_STATUS-'].update('Waiting to start DC Run')
+        update_step_status(window, f'Ready to start DC run for {tube}. Press Begin DC Run.')
     
         while True:
         
@@ -730,6 +753,7 @@ def main():
                 #EVENTUALlY, RUN FUNCTION WILL LIVE HERE
                 window['-START_DC-'].update(disabled=True)
                 window['-ACDC_STATUS-'].update('Collecting DC Data')
+                update_step_status(window, f'Running ({tube}) with DC electrodes, track 1 of {len(ydim)}.')
             
                 # calculate how many measurements the SMU needs to make
                 SMU_num = round( (xmax-xmin) * c.x_conv / c.col_spd_DC / c.SMU_sample_time + extra_cycles)
@@ -751,7 +775,7 @@ def main():
                 for y in np.arange(0,len(ydim)):
                 
                     # update status
-                    window['-READ_STATUS-'].update('Reading Row at y = '+str(round(ydim[y],3))+' mm')
+                    update_step_status(window, f'Running ({tube}) with DC electrodes, track {y + 1} of {len(ydim)}.')
                     event, values = window.read(timeout=15)
                 
                     # go to starting position
@@ -973,6 +997,7 @@ def main():
     if qt and AC_run:
         window['-START_AC-'].update(disabled=False)
         window['-ACDC_STATUS-'].update('Waiting to start AC Run')
+        update_step_status(window, f'Ready to start AC run for {tube}. Press Begin AC Run.')
     
         while True:
     
@@ -987,6 +1012,7 @@ def main():
                 # Update GUI
                 window['-START_AC-'].update(disabled=True)
                 window['-ACDC_STATUS-'].update('Collecting AC Data')
+                update_step_status(window, f'Running ({tube}) with AC electrodes, track 1 of {len(ydim)}.')
             
                 button_AC = np.empty([int(countmax),int(len(ydim))])
                 button_AC.fill(np.NaN)
@@ -1015,7 +1041,7 @@ def main():
                 for y in np.arange(0,len(ydim)):
                 
                     # update status
-                    window['-READ_STATUS-'].update('Reading Row at y = '+str(round(ydim[y],3))+' mm')
+                    update_step_status(window, f'Running ({tube}) with AC electrodes, track {y + 1} of {len(ydim)}.')
                     event, values = window.read(timeout=15)
                 
                     # go to starting position
@@ -1205,7 +1231,7 @@ def main():
             plt.show()        
 
     # update status
-    window['-READ_STATUS-'].update('Done Reading')
+    update_step_status(window, 'Run complete. Close the window when you are finished.')
         
     # Turn button off
     #mcc_digital(dio_device, port_to_write, 0)

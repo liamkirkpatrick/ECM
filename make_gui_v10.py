@@ -114,19 +114,19 @@ def guibuild():
                  [sg.Button('Set X1,Y1', size=(15,1), key='-X1Y1_SETUP-', disabled=True), sg.Text('   X Set At: '), sg.Text('not set', size=(8, 1), key='-X1_SET-')],
                  [sg.Text('                                        Y Set At: '), sg.Text('not set', size=(8, 1), key='-Y1_SET-')],
                  [sg.Text('Hold Down Button To Move')],
-        		 [sg.Text()],
-        		 [sg.Text('           '),
-         		 sg.RealtimeButton(sg.SYMBOL_UP, key='-X_UP-'),
-         		 sg.Text('           '),
-    			sg.RealtimeButton(sg.SYMBOL_UP, key='-Z_UP-')],
-        		[sg.RealtimeButton(sg.SYMBOL_LEFT, key='-Y_DOWN-'),
-         		sg.Text(size=(10, 1), key='-STATUS-', justification='c', pad=(0, 0)),
-         		sg.RealtimeButton(sg.SYMBOL_RIGHT, key='-Y_UP-')],
-        		[sg.Text('           '),
-         		sg.RealtimeButton(sg.SYMBOL_DOWN, key='-X_DOWN-'),
-         		sg.Text('           '),
-         		sg.RealtimeButton(sg.SYMBOL_DOWN, key='-Z_DOWN-')],
-        		[sg.Text()],
+             [sg.Text()],
+             [sg.Text('           '),
+         	 sg.RealtimeButton(sg.SYMBOL_UP, key='-X_UP-'),
+         	 sg.Text('           '),
+            sg.RealtimeButton(sg.SYMBOL_UP, key='-Z_UP-')],
+        [sg.RealtimeButton(sg.SYMBOL_LEFT, key='-Y_DOWN-'),
+         	 sg.Text(size=(10, 1), key='-STATUS-', justification='c', pad=(0, 0)),
+         	sg.RealtimeButton(sg.SYMBOL_RIGHT, key='-Y_UP-')],
+        [sg.Text('           '),
+         	sg.RealtimeButton(sg.SYMBOL_DOWN, key='-X_DOWN-'),
+         	sg.Text('           '),
+         	sg.RealtimeButton(sg.SYMBOL_DOWN, key='-Z_DOWN-')],
+        [sg.Text()],
 
         		# Absolute Movement Sections
         		[sg.Text('Enter Relative or Absolute Movements in mm')],
@@ -137,19 +137,19 @@ def guibuild():
          			sg.Text('Move Y Abs', size=(10, 1)), sg.InputText(size=(6, 1), key='Y_abs')],
         		[sg.Text('Move Z Rel', size=(10, 1)), sg.InputText(size=(6, 1), key='Z_rel'),
          			sg.Text('Move Z Abs', size=(10, 1)), sg.InputText(size=(6, 1), key='Z_abs')],
-        		[sg.Text('Press submit to enact move: '), sg.Submit()]]
+                [sg.Text('Press submit to enact move: '), sg.Submit()]]
 
-        # Build Third Column
-    third_col = [
-    	[sg.Column([[sg.Text('Admin Window',font=("Helvetica", 12, "bold"))]], justification='c')],
-    	[sg.Text("")],
+    # Build Third Column
+    admin_col = [
+        [sg.Column([[sg.Text('Admin Window',font=("Helvetica", 12, "bold"))]], justification='c')],
+        [sg.Text("")],
         [sg.Button('New Section (enter)',key='-NEW-', disabled=True),sg.Button('Repeat Last (r)',key='-SAME-', disabled=True),sg.Button('Switch AC/DC (s)',key='-FLIP-', disabled=True)],
         [sg.Text("Enter tube:", size=(23, 1)), sg.InputText('',size=(10,1), key="tube"),
-        sg.Button('Submit',key='-SUBMIT_TUBE-', disabled=True)],
+         sg.Button('Submit',key='-SUBMIT_TUBE-', disabled=True)],
         [sg.Text("Enter index mark relative location:", size=(23, 1)), sg.InputText('',size=(10,1), key="tieloc"),
-        sg.Button('Submit',key='-SUBMIT_TIELOC-', disabled=True)],
+         sg.Button('Submit',key='-SUBMIT_TIELOC-', disabled=True)],
         [sg.Text("Enter index mark depth:", size=(23, 1)), sg.InputText('',size=(10,1), key="depth"),
-        sg.Button('Submit',key='-SUBMIT_DEPTH-', disabled=True)],
+         sg.Button('Submit',key='-SUBMIT_DEPTH-', disabled=True)],
         [sg.Column([[sg.Text('File Name Input')]],justification='c')],
         [sg.Text("Enter notes:", size=(10, 1)), sg.InputText('',key="note", size=(30,1))],
         [sg.Button('Submit',key='-SUBMIT_NOTE-', disabled=True)],
@@ -157,18 +157,22 @@ def guibuild():
         #[sg.Button('Submit',key='-SUBMIT_FILENAME-',disabled=True)],
         [sg.Column([[sg.Text('Run Status')]], justification='c')],
         [sg.Text("Folder Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-RUN_STATUS-', justification='c')],
-        [sg.Text("MCC Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key = '-MCC_STATUS-', justification='c')],
-        [sg.Text("SMU Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key = '-SMU_STATUS-', justification='c')],
-        [sg.Text("LCR Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key = '-LCR_STATUS-', justification='c')],
+        [sg.Text("MCC Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-MCC_STATUS-', justification='c')],
+        [sg.Text("SMU Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-SMU_STATUS-', justification='c')],
+        [sg.Text("LCR Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-LCR_STATUS-', justification='c')],
         [sg.Text("Zaber Connection Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-CON_STATUS-', justification='c')],
         [sg.Text("Filename Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-FILE_STATUS-', justification='c')],
         [sg.Text("Setup Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-SETUP_STATUS-', justification='c')],
         [sg.Text("Write Resolution: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-WRITE_RES-', justification='c')],
         [sg.Text("AC/DC Status: ",size=(20,1),justification = 'r'),sg.Text(size=(20,1),key='-ACDC_STATUS-',justification = 'c')],
-        [sg.Text("Data Collect Status: ",size=(20,1),justification = 'r'), sg.Text(size=(20, 1), key='-READ_STATUS-', justification='c')],
         [sg.Button('Begin AC Run (enter)',key='-START_AC-'), sg.Button('Begin DC Run (enter)', key='-START_DC-')],
         [sg.Column([[sg.Quit(button_color=(sg.theme_button_color()[1], sg.theme_button_color()[0]), focus=True)]],
             justification='r')]]
+
+    status_row = [
+        sg.Text('STATUS:', font=("Helvetica", 12, "bold")),
+        sg.Text('', size=(110, 1), key='-STEP_STATUS-', justification='left')
+    ]
     
 
 
@@ -176,11 +180,13 @@ def guibuild():
 
     # ----- Full layout -----
     layout = [
+        status_row,
+        [sg.HorizontalSeparator()],
+        [sg.Column(admin_col, expand_x=True)],
+        [sg.HorizontalSeparator()],
         [sg.Column(first_col),
          sg.VSeparator(),
-         sg.Column(second_col),
-         sg.VSeparator(),
-         sg.Column(third_col)]
+         sg.Column(second_col)]
     ]
 
     return layout
