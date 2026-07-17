@@ -196,45 +196,44 @@ def main():
         
             print("Attempting to Home Z2")
             z2_dev = device_list[c.z2port]
-            z2_dev.generic_command(CommandCode.SET_HOME_SPEED, 1100)
+            z2_dev.generic_command(CommandCode.SET_HOME_SPEED, c.z2_spd_raw)
             # z2_dev.generic_command_with_unit(CommandCode.SET_HOME_SPEED,
             #                                  15,Units.VELOCITY_MILLIMETRES_PER_SECOND)
             z2_dev.home()
-            z2_dev.generic_command(CommandCode.SET_TARGET_SPEED,1100)
+            z2_dev.generic_command(CommandCode.SET_TARGET_SPEED,c.z2_spd_raw)
             #z2_dev.generic_command_with_unit(CommandCode.SET_TARGET_SPEED,
             #                                 15,Units.VELOCITY_MILLIMETRES_PER_SECOND)
             print("Finished Homing Z2")
         
             print("Attempting to Home Z1")
             z1_dev = device_list[c.z1port]
-            z1_dev.generic_command(CommandCode.SET_HOME_SPEED, 3600)
+            z1_dev.generic_command(CommandCode.SET_HOME_SPEED, c.z1_spd_raw)
             #z1_dev.generic_command_with_unit(CommandCode.SET_HOME_SPEED,5,Units.VELOCITY_MILLIMETRES_PER_SECOND)
             z1_dev.home()
             print("Finished Homing Z1")
-            z1_dev.generic_command(CommandCode.SET_TARGET_SPEED, 3600)
+            z1_dev.generic_command(CommandCode.SET_TARGET_SPEED, c.z1_spd_raw)
             #z1_dev.generic_command_with_unit(CommandCode.SET_TARGET_SPEED,5,Units.VELOCITY_MILLIMETRES_PER_SECOND)
         
             print("Attempting to Home Y1")
             y1_dev = device_list[c.y1port]
-            y1_dev.generic_command_with_units(CommandCode.SET_HOME_SPEED, 23, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+            y1_dev.generic_command_with_units(CommandCode.SET_HOME_SPEED, c.y_spd, Units.VELOCITY_MILLIMETRES_PER_SECOND)
             y1_dev.home()
             print("Finished Homing Y1")
-            y1_dev.generic_command_with_units(CommandCode.SET_TARGET_SPEED, 23, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+            y1_dev.generic_command_with_units(CommandCode.SET_TARGET_SPEED, c.y_spd, Units.VELOCITY_MILLIMETRES_PER_SECOND)
 
             print("Attempting to Home Y2")
             y2_dev = device_list[c.y2port]
-            y2_dev.generic_command_with_units(CommandCode.SET_HOME_SPEED, 23, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+            y2_dev.generic_command_with_units(CommandCode.SET_HOME_SPEED, c.y_spd, Units.VELOCITY_MILLIMETRES_PER_SECOND)
             y2_dev.home()
             print("Finished Homing Y2")
-            y2_dev.generic_command_with_units(CommandCode.SET_TARGET_SPEED, 23, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+            y2_dev.generic_command_with_units(CommandCode.SET_TARGET_SPEED, c.y_spd, Units.VELOCITY_MILLIMETRES_PER_SECOND)
         
 
             # Assign devices
             print("Attempting to Home X")      
             x_dev = device_list[c.xport]
-            #x_dev.generic_command(CommandCode.SET_HOME_SPEED, 7000)
             x_dev.home()
-            x_dev.generic_command(CommandCode.SET_HOME_SPEED, 2000)
+            x_dev.generic_command(CommandCode.SET_HOME_SPEED, 2500)
             x_dev.generic_command(CommandCode.SET_TARGET_SPEED, round(c.x_spd / c.xv_conv))
             x_dev.generic_command(CommandCode.SET_MICROSTEP_RESOLUTION, 64)
             print("Finished Homing X")        
@@ -365,19 +364,20 @@ def main():
 
     # Get Tube:
     if qt and set_new:
-    	[tube, qt] = getinput(window,'-SUBMIT_TUBE-','tube','TUBE')
+        window['tube'].update(c.autofill_label)
+        [tube, qt] = getinput(window,'-SUBMIT_TUBE-','tube','TUBE')
 
     # Get Index Mark (relative):
     if qt and set_new:
-    	[tieloc, qt] = getinput(window,'-SUBMIT_TIELOC-','tieloc','INDEX MARK (RELATIVE)')
+        [tieloc, qt] = getinput(window,'-SUBMIT_TIELOC-','tieloc','INDEX MARK (RELATIVE)')
 
     # Get Index Mark (depth):
     if qt and set_new:
-    	[depth, qt] = getinput(window,'-SUBMIT_DEPTH-','depth','INDEX MARK (DEPTH)')
+        [depth, qt] = getinput(window,'-SUBMIT_DEPTH-','depth','INDEX MARK (DEPTH)')
 
     # Get Note:
     if qt and set_new:
-    	[note, qt] = getinput(window,'-SUBMIT_NOTE-','note','NOTE')
+        [note, qt] = getinput(window,'-SUBMIT_NOTE-','note','NOTE')
 
     # Check setup (repeat or new)
     if qt and set_new:
@@ -569,7 +569,8 @@ def main():
                 z_setup = z1_dev
             
             # move y-axis so there are no length issues
-            y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
+            if c.BID_mode:
+                y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
         
             # bottom left (X0Y0)
             if qt:
@@ -596,17 +597,25 @@ def main():
                 [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
                 #zup=71
     
-            if qt:
-                z1_dev.home()
-                z2_dev.home()  
+
             
             # save values
             savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
         
-            # home z axis
+            # raise z-axis
             if qt:
-                z1_dev.home()
-                z2_dev.home()
+                try:
+                    z1_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                except:
+                    z1_dev.home() 
+                try:
+                    z2_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                except:
+                    z2_dev.home() 
+            
+            # if qt:
+            #     z1_dev.home()
+            #     z2_dev.home()  
 
             # Turn off laser
             #mcc_digital(dio_device, port_to_write, 0)
@@ -713,7 +722,8 @@ def main():
             if event == '-START_DC-' or keyboard.is_pressed('Enter'):
             
                 # move AC y-axis to ensure no cable length issues
-                y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
+                if c.BID_mode:
+                    y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
             
                 #EVENTUALlY, RUN FUNCTION WILL LIVE HERE
                 window['-START_DC-'].update(disabled=True)

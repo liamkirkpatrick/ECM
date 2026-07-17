@@ -7,6 +7,11 @@
 
 import numpy as np
 
+#%% Big Picture
+
+BID_mode = False
+autofill_label = 'ALHIC2501-'
+
 #%% Choices in how the system runs
 
 # Write Resolution (mm)
@@ -20,9 +25,11 @@ col_spd_DC = 25
 col_spd_AC = 10
 
 # axis default speeds (mm/s)
-x_spd = 50
-y_spd = 15
-z_spd = 15
+x_spd = 70
+y_spd = 30
+z_spd = 30 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
+z1_spd_raw = 4000
+z2_spd_raw = 1500
 
 #%% Spacing Variables
 
