@@ -25,11 +25,11 @@ col_spd_DC = 25
 col_spd_AC = 10
 
 # axis default speeds (mm/s)
-x_spd = 70
-y_spd = 30
-z_spd = 30 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
-z1_spd_raw = 4000
-z2_spd_raw = 1500
+x_spd = 75
+y_spd = 40
+z_spd = 40 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
+z1_spd_raw = 6000
+z2_spd_raw = 1800
 
 #%% Spacing Variables
 
