@@ -177,6 +177,18 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
             keys_to_clear = ['X_abs', 'X_rel', 'Y_abs', 'Y_rel', 'Z_abs', 'Z_rel']
             for key in keys_to_clear:
                 window[key]('')
+        elif keyboard.is_pressed('left'):
+            window['-STATUS-'].update('Left Arrow')
+            y_dev.move_velocity(-8, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+        elif keyboard.is_pressed('right'):
+            window['-STATUS-'].update('Right Arrow')
+            y_dev.move_velocity(8, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+        elif keyboard.is_pressed('up'):
+            window['-STATUS-'].update('Up Arrow')
+            x_dev.move_velocity(c.x_spd / c.xv_conv)
+        elif keyboard.is_pressed('down'):
+            window['-STATUS-'].update('Down Arrow')
+            x_dev.move_velocity(-c.x_spd / c.xv_conv)
         else:
             window['-STATUS-'].update('READY')
             try:
