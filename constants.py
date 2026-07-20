@@ -18,18 +18,18 @@ autofill_label = 'ALHIC2501-'
 write_res = 1
 
 # Spacing between tracks (on y-axis)
-y_space = 8.5
+y_space = 9.5
 
 # data collection speed (mm/s)
 col_spd_DC = 25
 col_spd_AC = 10
 
 # axis default speeds (mm/s)
-x_spd = 75
+x_spd = 70
 y_spd = 40
 z_spd = 40 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
-z1_spd_raw = 6000
-z2_spd_raw = 1800
+z1_spd_raw = 2500
+z2_spd_raw = 1400
 
 #%% Spacing Variables
 
