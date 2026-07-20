@@ -377,36 +377,24 @@ def main():
 
     # Get Tube:
     if qt and set_new:
-        admin_steps = [
-            ('Step 2: Enter tube information in the admin window.', '-SUBMIT_TUBE-', 'tube', 'TUBE', c.autofill_label),
-            ('Step 3: Enter index mark relative location.', '-SUBMIT_TIELOC-', 'tieloc', 'INDEX MARK (RELATIVE)', None),
-            ('Step 4: Enter index mark depth.', '-SUBMIT_DEPTH-', 'depth', 'INDEX MARK (DEPTH)', None),
-            ('Step 5: Enter notes for this run.', '-SUBMIT_NOTE-', 'note', 'NOTE', None),
-        ]
-        admin_values = {'tube': tube, 'tieloc': tieloc, 'depth': depth, 'note': note}
-        admin_step = 0
-        while qt and admin_step < len(admin_steps):
-            step_text, button_key, box_key, status, preset = admin_steps[admin_step]
-            update_step_status(window, step_text)
-            if preset is not None:
-                window[box_key].update(preset)
-            else:
-                window[box_key].update(admin_values[box_key] if admin_values[box_key] is not None else '')
-            value, qt, back = getinput(window, button_key, box_key, status)
-            if not qt:
-                break
-            if back:
-                admin_values[box_key] = ''
-                if admin_step > 0:
-                    admin_step -= 1
-                continue
-            admin_values[box_key] = value
-            admin_step += 1
+        update_step_status(window, 'Step 2: Enter tube information in the admin window.')
+        window['tube'].update(c.autofill_label)
+        [tube, qt] = getinput(window,'-SUBMIT_TUBE-','tube','TUBE')
 
-        tube = admin_values['tube']
-        tieloc = admin_values['tieloc']
-        depth = admin_values['depth']
-        note = admin_values['note']
+    # Get Index Mark (relative):
+    if qt and set_new:
+        update_step_status(window, 'Step 3: Enter index mark relative location.')
+        [tieloc, qt] = getinput(window,'-SUBMIT_TIELOC-','tieloc','INDEX MARK (RELATIVE)')
+
+    # Get Index Mark (depth):
+    if qt and set_new:
+        update_step_status(window, 'Step 4: Enter index mark depth.')
+        [depth, qt] = getinput(window,'-SUBMIT_DEPTH-','depth','INDEX MARK (DEPTH)')
+
+    # Get Note:
+    if qt and set_new:
+        update_step_status(window, 'Step 5: Enter notes for this run.')
+        [note, qt] = getinput(window,'-SUBMIT_NOTE-','note','NOTE')
 
     # Check setup (repeat or new)
     if qt and set_new:
@@ -604,49 +592,34 @@ def main():
             if c.BID_mode:
                 y2_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
         
-            setup_step = 0
-            while qt and setup_step < 4:
-                if setup_step == 0:
-                    update_step_status(window, 'Step 8a: Set X0/Y0 in the setup window.')
-                    xmin, yl, qt, back = setup_movxy(window, x_dev, y1_dev, z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-', '-Y0_SET-', 'X0Y0')
-                    if not qt:
-                        break
-                    if back:
-                        continue
-                elif setup_step == 1:
-                    update_step_status(window, 'Step 8b: Set the X tiepoint in the setup window.')
-                    xtie, qt, back = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv)
-                    if not qt:
-                        break
-                    if back:
-                        setup_step -= 1
-                        continue
-                elif setup_step == 2:
-                    update_step_status(window, 'Step 8c: Set X1/Y1 in the setup window.')
-                    xmax, yr, qt, back = setup_movxy(window, x_dev, y1_dev, z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-', '-Y1_SET-', 'X1Y1')
-                    if not qt:
-                        break
-                    if back:
-                        setup_step -= 1
-                        continue
-                elif setup_step == 3:
-                    update_step_status(window, 'Step 8d: Set Z height in the setup window.')
-                    zup, qt, back = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
-                    if not qt:
-                        break
-                    if back:
-                        setup_step -= 1
-                        continue
-
-                setup_step += 1
-
+            # bottom left (X0Y0)
+            if qt:
+                update_step_status(window, 'Step 8a: Set X0/Y0 in the setup window.')
+                [xmin,yl,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X0Y0_SETUP-', '-X0_SET-','-Y0_SET-', 'X0Y0')
+            if qt:
+                update_step_status(window, 'Step 8b: Set the X tiepoint in the setup window.')
+                [xtie, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE_SETUP-', '-XTIE_SET-', 'X Tiepoint', c.x_conv) 
+        
             #toggle tiepoints 2 and 3
             if False:
-                xtie2 = 0
-                xtie3 = 0
+                if qt:
+                    [xtie2, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE2_SETUP-', '-XTIE2_SET-', 'X Tiepoint 2', c.x_conv) 
+                if qt:
+                    [xtie3, qt] = setup_mov(window, x_dev, y_setup, z_setup, x_dev, qt, '-XTIE3_SETUP-', '-XTIE3_SET-', 'X Tiepoint 3', c.x_conv) 
             else:
                 xtie2 = 0
                 xtie3 = 0
+        
+            # top right (X1Y1)
+            if qt:
+                update_step_status(window, 'Step 8c: Set X1/Y1 in the setup window.')
+                [xmax,yr,qt] = setup_movxy(window, x_dev,y1_dev,z_setup, qt, '-X1Y1_SETUP-', '-X1_SET-','-Y1_SET-', 'X1Y1')
+            
+            # set up z axis 
+            if qt:
+                update_step_status(window, 'Step 8d: Set Z height in the setup window.')
+                [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
+                #zup=71
     
 
             

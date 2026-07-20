@@ -31,12 +31,10 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
 
     window['SETUP_INSTRUCT'].update('*** Set ' + des + ' Location ***')
     window[button].update(disabled=False)
-    window['-SETUP_BACK-'].update(disabled=False)
     
     loc = float("NaN")
     
     break_out_flag = False
-    back_out_flag = False
     
     stopX = True
     stopY = True
@@ -48,14 +46,25 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
 
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
+		
+		# check for window event
         event, values = window.read(timeout=15)
-
+        
+        # check for joystick controller events
         con_events = get_events()
-
+        
+        # Loop through all joystick controller events
+        #control_action_flag = False
         for con_event in con_events:
+            
+            # Loop through joystick actions
             if con_event.type == EVENT_STICK_MOVED:
                 if con_event.stick == LEFT:
+                    
+                    # only move it joystick is over 20% moved
                     if abs(con_event.y) > 0.2:
+                        
+                        #this was throwing errors so putting in a Try/except
                         try:
                             x_dev.move_velocity(c.x_spd / c.xv_conv * con_event.y)
                         except:
@@ -63,36 +72,43 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
                         stopX = False
                     else:
                         stopX = True
-
+                        
                     if abs(con_event.x) > 0.2:
-                        y_dev.move_velocity(8 * con_event.x, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+                        y_dev.move_velocity(8*con_event.x, Units.VELOCITY_MILLIMETRES_PER_SECOND)
                         stopY = False
-                    else:
-                        stopY = True
-
+                    else: stopY = True
+                    
+                    
                 if con_event.stick == RIGHT:
                     if abs(con_event.y) > 0.2:
-                        z_dev.move_velocity(3 * con_event.y * -1, Units.VELOCITY_MILLIMETRES_PER_SECOND)
+                        z_dev.move_velocity(3*con_event.y*-1, Units.VELOCITY_MILLIMETRES_PER_SECOND)
                         stopZ = False
                     else:
                         stopZ = True
 
+            
+            # Loop through button pressed options
             if con_event.type == EVENT_BUTTON_PRESSED:
-                if con_event.button == "X" or con_event.button == "B":
-                    if button == '-Z_SETUP-' or button == '-YL_SETUP-' or button == '-YR_SETUP-':
-                        loc = motor.get_position(unit=Units.LENGTH_MILLIMETRES)
+                if con_event.button == "X" or con_event.button =="B":
+                    
+                    # check if I need native units (x axis) or mm (all others)
+                    if  button == '-Z_SETUP-' or button == '-YL_SETUP-' or button == '-YR_SETUP-':
+                    	loc = motor.get_position(unit=Units.LENGTH_MILLIMETRES)
                     else:
-                        loc = motor.get_position(unit=Units.NATIVE)
-
-                    window[output].update(str(round(loc * conv, 2)) + ' mm')
-                    break_out_flag = True
-
+                    	loc = motor.get_position(unit=Units.NATIVE)
+                    
+                	# Print location to GUI window
+                    window[output].update(str(round(loc * conv, 2))+' mm')
+                	
+                	#break out of for loop, also break out of while loop with flag
+                    break_out_flag=True
+                    
                     time.sleep(0.5)
                     break
                 elif con_event.button == "DPAD_UP":
-                    x_dev.move_relative(1 / c.x_conv)
+                    x_dev.move_relative(1/ c.x_conv)  
                 elif con_event.button == "DPAD_DOWN":
-                    x_dev.move_relative(-1 / c.x_conv)
+                    x_dev.move_relative(-1 / c.x_conv)                    
                 elif con_event.button == "DPAD_RIGHT":
                     y_dev.move_relative(1, Units.LENGTH_MILLIMETRES)
                 elif con_event.button == "DPAD_LEFT":
@@ -101,23 +117,24 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
                     z_dev.move_relative(-1, Units.LENGTH_MILLIMETRES)
                 elif con_event.button == "A":
                     z_dev.move_relative(1, Units.LENGTH_MILLIMETRES)
-
+        
         if break_out_flag:
-            break
-
+        	break
+        
+        # Main loop, for mouse clicks
         if event in (sg.WIN_CLOSED, 'Quit'):
             qt = False
             break
-        elif event == '-SETUP_BACK-' or keyboard.is_pressed('b'):
-            back_out_flag = True
-            break
-        elif event == button or keyboard.is_pressed('Enter'):
-            if button == '-Z_SETUP-' or button == '-YL_SETUP-' or button == '-YR_SETUP-':
+        elif event == button:
+            
+            if  button == '-Z_SETUP-' or button == '-YL_SETUP-' or button == '-YR_SETUP-':
                 loc = motor.get_position(unit=Units.LENGTH_MILLIMETRES)
             else:
                 loc = motor.get_position(unit=Units.NATIVE)
-
-            window[output].update(str(round(loc * conv, 2)) + ' mm')
+                
+            # Print location to GUI window
+            window[output].update(str(round(loc * conv, 2))+' mm')
+            
             break
         elif event == '-X_UP-':
             window['-STATUS-'].update(event)
@@ -138,6 +155,11 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
             window['-STATUS-'].update(event)
             z_dev.move_velocity(2, Units.VELOCITY_MILLIMETRES_PER_SECOND)
         elif event == 'Submit':
+
+            # *******************************************
+            # need to add check that all inputs are valid
+            # *******************************************
+
             if bool(window['X_abs'].get()):
                 x_dev.move_absolute(float(window['X_abs'].get()) / c.x_conv, timeout=120)
             if bool(window['Y_abs'].get()):
@@ -145,12 +167,13 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
             if bool(window['Z_abs'].get()):
                 z_dev.move_absolute(float(window['Z_abs'].get()), Units.LENGTH_MILLIMETRES)
             if bool(window['X_rel'].get()):
-                x_dev.move_relative(float(window['X_rel'].get()) / c.x_conv, timeout=120)
+                x_dev.move_relative(float(window['X_rel'].get()) / c.x_conv, timeout = 120)
             if bool(window['Y_rel'].get()):
                 y_dev.move_relative(float(window['Y_rel'].get()), Units.LENGTH_MILLIMETRES)
             if bool(window['Z_rel'].get()):
                 z_dev.move_relative(float(window['Z_rel'].get()), Units.LENGTH_MILLIMETRES)
 
+            # Clear inputs
             keys_to_clear = ['X_abs', 'X_rel', 'Y_abs', 'Y_rel', 'Z_abs', 'Z_rel']
             for key in keys_to_clear:
                 window[key]('')
@@ -177,17 +200,16 @@ def setup_mov(window,x_dev,y_dev,z_dev,motor, qt, button, output, des, conv):
                     z_dev.stop()
             except:
                 print('Error Stopping')
+            
+            # STOP
     # read one more time to print out last value
     event, values = window.read(timeout=15)
     
     # disable button
     window[button].update(disabled=True)
-    window['-SETUP_BACK-'].update(disabled=True)
     
     while keyboard.is_pressed('Enter'):
         time.sleep(0.5)
-    while keyboard.is_pressed('b'):
-        time.sleep(0.5)
     
     #return position value, and quit T/F
-    return loc, qt, back_out_flag
+    return loc, qt
