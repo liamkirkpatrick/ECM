@@ -629,11 +629,11 @@ def main():
             # raise z-axis
             if qt:
                 try:
-                    z1_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                    z1_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
                 except:
                     z1_dev.home() 
                 try:
-                    z2_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                    z2_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
                 except:
                     z2_dev.home() 
             
@@ -678,9 +678,10 @@ def main():
         
         ydim = np.array([yl+edgespace])
     
+        # add 
         if yl != yr:
-            while ydim[-1] < yr-edgespace:
-                ydim = np.append(ydim,ydim[-1]+round(c.y_space))
+            while ydim[-1] < (yr-edgespace)-0.5*c.y_space: 
+                ydim = np.append(ydim,ydim[-1]+c.y_space)
             ydim[-1] = yr-edgespace
         
         
@@ -862,7 +863,7 @@ def main():
                     x_dev.stop()
                     time.sleep(0.5)
                     try:
-                        z1_dev.move_relative(-30,Units.LENGTH_MILLIMETRES)
+                        z1_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
                     except:
                         z1_dev.home() 
                 
@@ -1136,7 +1137,7 @@ def main():
                     x_dev.stop()
                     time.sleep(0.5)
                     try:
-                        z2_dev.move_relative(-50,Units.LENGTH_MILLIMETRES)
+                        z2_dev.move_relative(-45,Units.LENGTH_MILLIMETRES)
                     except:
                         z2_dev.home() 
             
