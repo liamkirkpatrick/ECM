@@ -1164,7 +1164,7 @@ def main():
                     x_dev.stop()
                     time.sleep(0.5)
                     try:
-                        z2_dev.move_relative(-35,Units.LENGTH_MILLIMETRES)
+                        z2_dev.move_relative(-45,Units.LENGTH_MILLIMETRES)
                     except:
                         z2_dev.home() 
             
