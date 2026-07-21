@@ -27,6 +27,7 @@ class _ACPlotWorker:
         self.fig = None
         self.ax = None
         self.lines = []
+        self.leading_edge = []
         self.xdata = []
         self.ydata = []
         self.ydim = []
@@ -71,15 +72,25 @@ class _ACPlotWorker:
         self.xdata = [[] for _ in self.ydim]
         self.ydata = [[] for _ in self.ydim]
         self.lines = []
+        self.leading_edge = []
         for i, yval in enumerate(self.ydim):
             line, = self.ax.plot([], [], color=cmap(i / max(len(self.ydim), 1)), label=str(round(yval, 3)))
             self.lines.append(line)
+            edge, = self.ax.plot([], [], linestyle="None", marker="o", markersize=5,
+                                 color="red", zorder=5)
+            self.leading_edge.append(edge)
 
         self.ax.legend(title="Distance across core:", fontsize=8)
         self.fig.canvas.draw_idle()
         self.fig.canvas.flush_events()
         self.last_draw = time.time()
         self.configured = True
+
+    def _update_leading_edge(self, track):
+        if not self.xdata[track]:
+            self.leading_edge[track].set_data([], [])
+            return
+        self.leading_edge[track].set_data([self.xdata[track][-1]], [self.ydata[track][-1]])
 
     def _point(self, msg):
         if not self.configured:
@@ -101,6 +112,7 @@ class _ACPlotWorker:
         self.xdata[track].append(x)
         self.ydata[track].append(y)
         self.lines[track].set_data(self.xdata[track], self.ydata[track])
+        self._update_leading_edge(track)
         self.needs_draw = True
 
     def _replace_track(self, msg):
@@ -115,6 +127,7 @@ class _ACPlotWorker:
         self.xdata[track] = x[good].tolist()
         self.ydata[track] = y[good].tolist()
         self.lines[track].set_data(self.xdata[track], self.ydata[track])
+        self._update_leading_edge(track)
         self.needs_draw = True
 
     def _finish_track(self, msg):
