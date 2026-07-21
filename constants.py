@@ -9,8 +9,14 @@ import numpy as np
 
 #%% Big Picture
 
+# BID mode - turn on when running BID cores
 BID_mode = False
+
+# autofill label - option to autofill core label. Leave as '' if yoou don't want
 autofill_label = 'ALHIC2501-'
+
+# z_up set (set to None if you don't want)
+z_up_set = 60
 
 #%% Choices in how the system runs
 
@@ -25,11 +31,11 @@ col_spd_DC = 25
 col_spd_AC = 10
 
 # axis default speeds (mm/s)
-x_spd = 70
+x_spd = 65
 y_spd = 40
 z_spd = 40 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
-z1_spd_raw = 1600
-z2_spd_raw = 350
+z1_spd_raw = 1800
+z2_spd_raw = 400
 
 #%% Spacing Variables
 

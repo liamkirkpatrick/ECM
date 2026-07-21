@@ -617,25 +617,40 @@ def main():
             
             # set up z axis 
             if qt:
-                update_step_status(window, 'Step 8d: Set Z height in the setup window.')
-                [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
-                #zup=71
+                if c.z_up_set is None:
+                    update_step_status(window, 'Step 8d: Set Z height in the setup window.')
+                    [zup, qt] = setup_mov(window, x_dev, y_setup, z_setup, z_setup, qt, '-Z_SETUP-', '-Z_SET-', 'Z Up Height', 1)
+                    
+                    # raise z-axis
+                    if qt:
+                        try:
+                            z1_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
+                        except:
+                            z1_dev.home() 
+                        try:
+                            z2_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
+                        except:
+                            z2_dev.home() 
+                else:
+                    zup=60
+                    
+                    # raise z-axis
+                    if qt:
+                        try:
+                            z1_dev.move_relative(-10,Units.LENGTH_MILLIMETRES)
+                        except:
+                            z1_dev.home() 
+                        try:
+                            z2_dev.move_relative(-10,Units.LENGTH_MILLIMETRES)
+                        except:
+                            z2_dev.home() 
     
 
             
             # save values
             savelast(yl,yr,xmin,xmax,xtie,xtie2,xtie3,zup)
         
-            # raise z-axis
-            if qt:
-                try:
-                    z1_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
-                except:
-                    z1_dev.home() 
-                try:
-                    z2_dev.move_relative(-25,Units.LENGTH_MILLIMETRES)
-                except:
-                    z2_dev.home() 
+
             
             # if qt:
             #     z1_dev.home()
