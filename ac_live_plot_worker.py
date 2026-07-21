@@ -35,6 +35,7 @@ class _ACPlotWorker:
         self.initial_ylim = (0, 10e-8)
         self.last_draw = 0.0
         self.needs_draw = False
+        self.second_track_ylim_set = False
 
     def start_reader_thread(self):
         thread = threading.Thread(target=self._reader_loop, daemon=True)
@@ -74,7 +75,9 @@ class _ACPlotWorker:
         self.lines = []
         self.leading_edge = []
         for i, yval in enumerate(self.ydim):
-            line, = self.ax.plot([], [], color=cmap(i / max(len(self.ydim), 1)), label=str(round(yval, 3)))
+            line, = self.ax.plot(
+                [], [], color=cmap(i / max(len(self.ydim), 1)), label=str(round(yval, 3)), linewidth=1.2
+            )
             self.lines.append(line)
             edge, = self.ax.plot([], [], linestyle="None", marker="o", markersize=5,
                                  color="red", zorder=5)
@@ -91,6 +94,20 @@ class _ACPlotWorker:
             self.leading_edge[track].set_data([], [])
             return
         self.leading_edge[track].set_data([self.xdata[track][-1]], [self.ydata[track][-1]])
+
+    def _apply_second_track_ylim(self, track):
+        if self.second_track_ylim_set or track != 1:
+            return
+        previous_values = []
+        for prior_track in range(track):
+            previous_values.extend(value for value in self.ydata[prior_track] if np.isfinite(value))
+        if not previous_values:
+            return
+        upper = 1.1 * float(np.percentile(previous_values, 95))
+        if np.isfinite(upper) and upper > 0:
+            self.ax.set_ylim(0, upper)
+            self.second_track_ylim_set = True
+            self.needs_draw = True
 
     def _point(self, msg):
         if not self.configured:
@@ -112,6 +129,7 @@ class _ACPlotWorker:
         self.xdata[track].append(x)
         self.ydata[track].append(y)
         self.lines[track].set_data(self.xdata[track], self.ydata[track])
+        self._apply_second_track_ylim(track)
         self._update_leading_edge(track)
         self.needs_draw = True
 
@@ -127,15 +145,16 @@ class _ACPlotWorker:
         self.xdata[track] = x[good].tolist()
         self.ydata[track] = y[good].tolist()
         self.lines[track].set_data(self.xdata[track], self.ydata[track])
+        self._apply_second_track_ylim(track)
         self._update_leading_edge(track)
         self.needs_draw = True
 
     def _finish_track(self, msg):
         if not self.configured:
             return
-        # Autoscale y only at the end of a track. Keep x fixed as distance.
-        self.ax.relim()
-        self.ax.autoscale_view(scalex=False, scaley=True)
+        track = int(msg.get("track", -1))
+        if 0 <= track < len(self.leading_edge):
+            self.leading_edge[track].set_data([], [])
         self.needs_draw = True
         self._draw(force=True)
 
