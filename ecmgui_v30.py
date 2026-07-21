@@ -1008,7 +1008,8 @@ def main():
             if event == '-START_AC-' or keyboard.is_pressed('Enter'):
             
                 # move opposite axis so there are no length issues
-                y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
+                if c.BID_mode:
+                    y1_dev.move_absolute(80,Units.LENGTH_MILLIMETRES)
             
                 # Update GUI
                 window['-START_AC-'].update(disabled=True)
@@ -1137,7 +1138,7 @@ def main():
                     x_dev.stop()
                     time.sleep(0.5)
                     try:
-                        z2_dev.move_relative(-45,Units.LENGTH_MILLIMETRES)
+                        z2_dev.move_relative(-35,Units.LENGTH_MILLIMETRES)
                     except:
                         z2_dev.home() 
             
