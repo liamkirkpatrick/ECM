@@ -103,9 +103,10 @@ class _ACPlotWorker:
             previous_values.extend(value for value in self.ydata[prior_track] if np.isfinite(value))
         if not previous_values:
             return
-        upper = 1.1 * float(np.percentile(previous_values, 95))
-        if np.isfinite(upper) and upper > 0:
-            self.ax.set_ylim(0, upper)
+        lower = 0.8 * float(np.percentile(previous_values, 5))
+        upper = 1.2 * float(np.percentile(previous_values, 95))
+        if np.isfinite(lower) and np.isfinite(upper) and upper > lower:
+            self.ax.set_ylim(lower, upper)
             self.second_track_ylim_set = True
             self.needs_draw = True
 
