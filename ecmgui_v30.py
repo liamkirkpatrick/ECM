@@ -50,6 +50,7 @@ import keyboard
 
 # Import functions
 from make_gui_v10 import guibuild, delete_figure, draw_figure, makeplot
+from plotting_function import make_run_plot
 from setup_movement_v6 import setup_mov
 from setup_movement_xandy import setup_movxy
 from getinput import getinput
@@ -999,12 +1000,16 @@ def main():
     if qt:
         # make summary plot
         if qt and DC_run:
-            plt.figure(2)
-            plt.clf()
-            for y in range(0,len(ydim)):
-                plt.plot(x_smu[30:,y],c_corr_smu[30:,y],color=cmap(y/len(ydim)))
-            plt.title('DC Runs')
-            plt.show()  
+            fig, save_path = make_run_plot(
+                x_smu,
+                c_corr_smu,
+                ydim,
+                'DC',
+                fldr,
+                tube,
+                show=True,
+            )
+            print(f'Saved DC figure to {save_path}')
 
     #%% Collect AC Data
     # ==========================================================================================================
@@ -1238,14 +1243,16 @@ def main():
     if qt:
         # make summary plot
         if qt and AC_run:
-            plt.figure(3)
-            plt.clf()
-            for y in range(0,len(ydim)):
-                plt.plot(np.arange(0,int(countmax)) * c.mm_per_step,G_AC[:,y],color=cmap(y/len(ydim)))
-            plt.xlabel('Distance Along Track (mm)')
-            plt.ylabel('Conductivity')
-            plt.title('AC Runs')
-            plt.show()        
+            fig, save_path = make_run_plot(
+                np.arange(0, int(countmax)) * c.mm_per_step,
+                G_AC,
+                ydim,
+                'AC',
+                fldr,
+                tube,
+                show=True,
+            )
+            print(f'Saved AC figure to {save_path}')
 
     # update status
     update_step_status(window, 'Run complete. Close the window when you are finished.')
@@ -1285,11 +1292,12 @@ def main():
     except:
         print("Failed to close Zaber connection (may have quit before connecting")
     
-    # close the 
+    # close the LCR/SMU 
     try:
         rm.close()
     except:
         print("Failed to close SMU/LCR connection (may have quit before connecting")
+    
 
     # print ending information
     print("*********************************************************************************")
