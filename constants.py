@@ -34,8 +34,8 @@ col_spd_AC = 10
 x_spd = 65
 y_spd = 40
 z_spd = 40 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
-z1_spd_raw = 2000
-z2_spd_raw = 450
+z1_spd_raw = 2600
+z2_spd_raw = 600
 
 #%% Spacing Variables
 
