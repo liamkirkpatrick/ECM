@@ -1008,6 +1008,8 @@ def main():
                 fldr,
                 tube,
                 show=True,
+                button_mask=button_smu > 0.5,
+                track_limits=(yl, yr),
             )
             print(f'Saved DC figure to {save_path}')
 
@@ -1251,6 +1253,8 @@ def main():
                 fldr,
                 tube,
                 show=True,
+                button_mask=button_AC,
+                track_limits=(yl, yr),
             )
             print(f'Saved AC figure to {save_path}')
 
