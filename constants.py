@@ -35,7 +35,7 @@ x_spd = 65
 y_spd = 40
 z_spd = 40 # note: due to a change with motores, this doesn't currently work. Use vals below in motor units. Working on it.
 z1_spd_raw = 2600
-z2_spd_raw = 600
+z2_spd_raw = 700
 
 #%% Spacing Variables
 
@@ -47,8 +47,8 @@ acdc_offset = 305
 # DC to laser offset, in mm, measured at ICF
 laser_offset = -10         
 
-# temp, w/ broken motor
-z_offset = 0 
+# how much less/more to move AC z motor (should be negative = less)
+z_offset = -20
 
 # edge_to_electrode offset, AC, mm
 ac_edgespace = 16
