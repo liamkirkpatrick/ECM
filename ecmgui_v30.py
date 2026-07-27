@@ -187,7 +187,7 @@ def main():
     update_step_status(window, 'Connecting to Zaber motors.')
     try:
         # if True:
-        connection = Connection.open_serial_port("COM3")
+        connection = Connection.open_serial_port("COM4")
     
         print("connection = true")
         #connection = Connection.open_serial_port("COM7")
