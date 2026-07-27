@@ -674,6 +674,10 @@ def main():
     update_step_status(window, 'Setup complete. Press Begin AC Run or Begin DC Run to start acquisition.')
     event, values = window.read(timeout=15)
 
+    # if the user selected DC, add 30 mm to xmax (including unit conversion if needed)
+    if qt and DC_run:
+        xmax += 30 / c.x_conv
+
     # Move to xmax positions
     if qt:
         if AC_run:
